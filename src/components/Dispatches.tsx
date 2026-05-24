@@ -71,7 +71,7 @@ export default function Dispatches({
   const calculateRowAmount = (netWeight: number, rate: number, discPct: number) => {
     const rawVal = netWeight * rate;
     const discountAmount = rawVal * (discPct / 100);
-    return Math.max(0, parseFloat((rawVal - discountAmount).toFixed(1)));
+    return Math.max(0, parseFloat((rawVal - discountAmount).toFixed(2)));
   };
 
   // Add Item to table builder list
@@ -91,7 +91,7 @@ export default function Dispatches({
     }
 
     const discountPct = selectedShop ? selectedShop.discountPercentage : 0;
-    const netWeight = Math.max(0, tempGross - tempTray - tempWastage);
+    const netWeight = Math.max(0, (tempGross - tempTray) * (1 - tempWastage / 100));
     const amount = calculateRowAmount(netWeight, sweet.sellingRate, discountPct);
 
     const newItemRow: TripItem = {
@@ -130,7 +130,7 @@ export default function Dispatches({
 
     // Recalculate weights
     if (field === 'grossWeight' || field === 'trayWeight' || field === 'wastage') {
-      row.netWeight = Math.max(0, row.grossWeight - row.trayWeight - row.wastage);
+      row.netWeight = Math.max(0, (row.grossWeight - row.trayWeight) * (1 - row.wastage / 100));
     }
 
     // Recalculate total amount
@@ -477,7 +477,7 @@ export default function Dispatches({
                         </td>
 
                         <td className="p-3 text-right font-bold text-white border-r border-slate-850">
-                          ₹ {item.amount.toLocaleString()}
+                          ₹ {item.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </td>
 
                         <td className="p-3 text-right text-slate-500 hover:text-rose-400">
@@ -492,7 +492,7 @@ export default function Dispatches({
                     <tr>
                       <td colSpan={7} className="p-3 text-right font-semibold uppercase text-slate-500">Dispatch Invoice Grand Total:</td>
                       <td className="p-3 text-right text-amber-500 text-sm">
-                        ₹ {grandTotalAmount.toLocaleString()}
+                        ₹ {grandTotalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </td>
                       <td></td>
                     </tr>
@@ -561,7 +561,7 @@ export default function Dispatches({
                     <div>
                       <span className="text-[10px] text-slate-650 block text-right">TOTAL INVOICE</span>
                       <span className="text-amber-400 font-bold block">
-                        ₹ {trip.totalAmount.toLocaleString()}
+                        ₹ {trip.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
 
@@ -602,7 +602,7 @@ export default function Dispatches({
                           <td className="py-2.5 text-center font-bold text-slate-100">{srv.netWeight.toFixed(1)}</td>
                           <td className="py-2.5 text-center">₹{srv.rate}</td>
                           <td className="py-2.5 text-center text-indigo-400">-{srv.discountPercentage}%</td>
-                          <td className="py-2.5 text-right font-bold text-white">₹{srv.amount.toLocaleString()}</td>
+                          <td className="py-2.5 text-right font-bold text-white">₹{srv.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                         </tr>
                       ))}
                     </tbody>

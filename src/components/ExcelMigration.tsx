@@ -88,24 +88,29 @@ export default function ExcelMigration({ onImportCompleted }: ExcelMigrationProp
       };
 
       const name = String(findValue(['item_name', 'item name', 'sweet', 'product', 'name'], `Excel Sweet ${index + 1}`)).trim();
-      const catRaw = String(findValue(['category', 'type', 'group'], 'Ghee Special')).trim().toLowerCase();
+      const uomVal = String(findValue(['uom', 'unit', 'measure'], '')).trim().toUpperCase();
+      const catRaw = String(findValue(['category', 'type', 'group'], '')).trim().toLowerCase();
       
-      // Categorize: 'Dry' | 'Khoya/Milk' | 'Syrup' | 'Savory' | 'Ghee Special'
       let category: 'Dry' | 'Khoya/Milk' | 'Syrup' | 'Savory' | 'Ghee Special' = 'Ghee Special';
       if (catRaw.includes('dry') || catRaw.includes('kaju') || catRaw.includes('nuts')) category = 'Dry';
       else if (catRaw.includes('milk') || catRaw.includes('khoya') || catRaw.includes('mawa') || catRaw.includes('dairy')) category = 'Khoya/Milk';
       else if (catRaw.includes('syrup') || catRaw.includes('rasgulla') || catRaw.includes('gulab')) category = 'Syrup';
       else if (catRaw.includes('savory') || catRaw.includes('namkeen') || catRaw.includes('snack')) category = 'Savory';
       else if (catRaw.includes('ghee')) category = 'Ghee Special';
+      else {
+        // map based on UOM if category is empty
+        if (uomVal === 'B') category = 'Dry';
+        else if (uomVal === 'S') category = 'Syrup';
+        else if (uomVal === 'K') category = 'Khoya/Milk';
+      }
 
-      const unitRaw = String(findValue(['unit', 'uom', 'measure'], 'Kg')).trim().toLowerCase();
       let unit: 'Kg' | 'Box' | 'Piece' = 'Kg';
-      if (unitRaw.includes('box') || unitRaw.includes('pkt')) unit = 'Box';
-      else if (unitRaw.includes('pc') || unitRaw.includes('piece')) unit = 'Piece';
+      if (uomVal === 'B' || uomVal.includes('box') || uomVal.includes('pkt')) unit = 'Box';
+      else if (uomVal === 'P' || uomVal.includes('pc') || uomVal.includes('piece')) unit = 'Piece';
 
       const selling = parseFloat(findValue(['rate', 'selling', 'wholesale', 'price'], 380)) || 380;
-      const cost = parseFloat(findValue(['cost', 'production', 'cook', 'manufacturing'], 220)) || 220;
-      const ingredients = String(findValue(['ingredient', 'composition', 'formulation'], 'Pure ingredients')).trim();
+      const cost = parseFloat(findValue(['cost', 'production', 'cook', 'manufacturing'], Math.round(selling * 0.6))) || Math.round(selling * 0.6);
+      const ingredients = String(findValue(['ingredient', 'composition', 'formulation', 'notes'], 'Ingredients specified in production sheets.')).trim();
 
       return {
         id: `WL-${Date.now()}-${index}`,
@@ -159,31 +164,38 @@ export default function ExcelMigration({ onImportCompleted }: ExcelMigrationProp
         }
       }
 
-      const trip = String(findValue(['trip', 'code', 'reference'], 'S1')).toUpperCase().trim();
-      const shop = String(findValue(['shop', 'destination', 'customer', 'client'], 'Legacy Outlet')).trim();
-      const item = String(findValue(['item', 'sweet', 'product'], 'Pedha')).trim();
+      const trip = String(findValue(['trip name', 'trip_name', 'trip', 'code', 'reference'], 'S1')).toUpperCase().trim();
+      const shop = String(findValue(['shop name', 'shop_name', 'shop', 'destination', 'customer', 'client'], 'Legacy Outlet')).trim();
+      const item = String(findValue(['name', 'item', 'sweet', 'product'], 'Pedha')).trim();
       
-      const gross = parseFloat(findValue(['gross', 'weight', 'qty', 'quantity'], 10)) || 10;
-      const tray = parseFloat(findValue(['tray', 'empty'], 1.5)) || 0;
+      const gross = parseFloat(findValue(['total', 'gross', 'weight', 'qty', 'quantity'], 0)) || 0;
+      const tray = parseFloat(findValue(['tray', 'empty'], 0)) || 0;
       const wastage = parseFloat(findValue(['wastage', 'scrap', 'waste'], 0)) || 0;
-      const net = gross - tray - wastage;
       
-      const rate = parseFloat(findValue(['rate', 'selling', 'price', 'wholesale'], 350)) || 350;
-      const discount = parseFloat(findValue(['discount', 'disc', 'percentage'], 5)) || 0;
-      const amt = parseFloat(findValue(['amount', 'final_amount', 'total'], net * rate * (1 - discount/100))) || (net * rate * (1 - discount/100));
+      // Net Weight calculation following the formula: (gross - tray) * (1 - wastage / 100)
+      const net = parseFloat(findValue(['net', 'net weight', 'net_weight'], (gross - tray) * (1 - wastage / 100))) || ((gross - tray) * (1 - wastage / 100));
+      
+      const rate = parseFloat(findValue(['price', 'rate', 'selling', 'wholesale'], 350)) || 0;
+      const discount = parseFloat(findValue(['%', 'discount', 'disc', 'percentage'], 0)) || 0;
+      
+      // Item Amount represents the total post-discount bill amount for the dispatch
+      const amt = parseFloat(findValue(['item amount', 'item_amount', 'amount', 'total'], net * rate * (1 - discount/100))) || (net * rate * (1 - discount/100));
 
-      parsedFlatRows.push({
-        date: dateStr,
-        tripNumber: trip,
-        shopName: shop,
-        sweetItemName: item,
-        grossWeight: gross,
-        trayWeight: tray,
-        wastage,
-        rate,
-        discountPercentage: discount,
-        amount: amt
-      });
+      // Skip invalid rows that don't have a valid shop and item defined
+      if (shop !== 'Legacy Outlet' && item !== 'Pedha') {
+        parsedFlatRows.push({
+          date: dateStr,
+          tripNumber: trip,
+          shopName: shop,
+          sweetItemName: item,
+          grossWeight: gross,
+          trayWeight: tray,
+          wastage: wastage,
+          rate: rate,
+          discountPercentage: discount,
+          amount: amt
+        });
+      }
     });
 
     const groupedTrips: { [key: string]: TripEntry } = {};
@@ -199,32 +211,34 @@ export default function ExcelMigration({ onImportCompleted }: ExcelMigrationProp
       const itemId = matchedItem ? matchedItem.id : `WL-INC-${idx}`;
       const itemNameClean = matchedItem ? matchedItem.name : flat.sweetItemName;
 
+      const netWeightCalc = Number(((flat.grossWeight - flat.trayWeight) * (1 - flat.wastage / 100)).toFixed(3));
+
       const tripItem = {
         sweetItemId: itemId,
         sweetItemName: itemNameClean,
         grossWeight: flat.grossWeight,
         trayWeight: flat.trayWeight,
         wastage: flat.wastage,
-        netWeight: flat.grossWeight - flat.trayWeight - flat.wastage,
+        netWeight: netWeightCalc,
         rate: flat.rate,
         discountPercentage: flat.discountPercentage,
-        amount: Math.round(flat.amount)
+        amount: Number(flat.amount.toFixed(2))
       };
 
       if (!groupedTrips[groupKey]) {
         groupedTrips[groupKey] = {
-          id: `TL-EXCEL-${idx}`,
+          id: `TL-EXCEL-${idx}-${Date.now()}`,
           tripNumber: flat.tripNumber,
           shopId: shopId,
           shopName: shopNameClean,
           date: flat.date,
           items: [tripItem],
-          totalAmount: Math.round(flat.amount),
+          totalAmount: Number(flat.amount.toFixed(2)),
           status: 'Completed'
         };
       } else {
         groupedTrips[groupKey].items.push(tripItem);
-        groupedTrips[groupKey].totalAmount += Math.round(flat.amount);
+        groupedTrips[groupKey].totalAmount = Number((groupedTrips[groupKey].totalAmount + flat.amount).toFixed(2));
       }
     });
 
@@ -256,44 +270,99 @@ export default function ExcelMigration({ onImportCompleted }: ExcelMigrationProp
 
         workbook.SheetNames.forEach((sheetName) => {
           const worksheet = workbook.Sheets[sheetName];
-          const rawRows = XLSX.utils.sheet_to_json(worksheet);
+          const sheetData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
 
-          if (rawRows.length === 0) {
+          if (sheetData.length === 0) {
             logs.push(`⚠ Sheet "${sheetName}" is empty, skipping scan`);
             return;
           }
 
-          const sampleRow = rawRows[0] as any;
-          const headers = Object.keys(sampleRow);
-          const type = detectSheetType(headers);
+          // Scan first 10 rows to locate the real header row dynamically
+          let headerIdx = 0;
+          let sheetType: 'shops' | 'items' | 'dispatches' | 'unknown' = 'unknown';
 
-          logs.push(`🔍 Analyzing Sheet "${sheetName}" (${rawRows.length} rows)...`);
+          for (let r = 0; r < Math.min(sheetData.length, 10); r++) {
+            const row = sheetData[r] || [];
+            const cols = row.map(c => String(c || '').toLowerCase().trim());
+            if (cols.includes('trip name') || cols.includes('item amount') || cols.includes('tray') || cols.includes('wastage')) {
+              headerIdx = r;
+              sheetType = 'dispatches';
+              break;
+            } else if (cols.includes('item name') || (cols.includes('uom') && cols.includes('rate'))) {
+              headerIdx = r;
+              sheetType = 'items';
+              break;
+            } else if (cols.includes('discount %') || (cols.includes('name') && cols.includes('discount %'))) {
+              headerIdx = r;
+              sheetType = 'shops';
+              break;
+            }
+          }
 
-          if (type === 'shops') {
+          // If no specific sheetType was detected, we fallback to simple cell heuristic matching
+          if (sheetType === 'unknown' && sheetData.length > 0) {
+            const row0 = sheetData[0] || [];
+            const cols = row0.map(c => String(c || '').toLowerCase().trim());
+            if (cols.some(c => c.includes('sweet') || c.includes('item') || c.includes('rate'))) {
+              sheetType = 'items';
+              headerIdx = 0;
+            } else if (cols.some(c => c.includes('shop') || c.includes('discount'))) {
+              sheetType = 'shops';
+              headerIdx = 0;
+            } else {
+              sheetType = 'shops'; // default fallback
+              headerIdx = 0;
+            }
+          }
+
+          // Generate dynamic row objects where keys match exactly the cells of the header row
+          const headers = (sheetData[headerIdx] || []).map(h => String(h || '').trim());
+          const rawRows: any[] = [];
+          for (let r = headerIdx + 1; r < sheetData.length; r++) {
+            const rowData = sheetData[r];
+            if (!rowData || rowData.every(cell => cell === null || cell === undefined || cell === '')) continue;
+            
+            const obj: any = {};
+            headers.forEach((header, colIdx) => {
+              if (header) {
+                obj[header] = rowData[colIdx];
+              }
+            });
+            rawRows.push(obj);
+          }
+
+          logs.push(`🔍 Analyzing Sheet "${sheetName}" (Heuristics matched Header Row ${headerIdx + 1}) (${rawRows.length} rows parsed)...`);
+
+          if (sheetType === 'shops') {
             const parsed = extractShops(rawRows);
             tempShops = [...tempShops, ...parsed];
             logs.push(`   ↳ Auto-Map matched to "ShopMaster" (Registered: ${parsed.length} outlets)`);
-          } else if (type === 'items') {
+          } else if (sheetType === 'items') {
             const parsed = extractItems(rawRows);
             tempItems = [...tempItems, ...parsed];
             logs.push(`   ↳ Auto-Map matched to "ItemMaster" (Registered: ${parsed.length} sweet catalog items)`);
-          } else if (type === 'dispatches') {
-            // we will resolve matches inside previews
+          } else if (sheetType === 'dispatches') {
+            // resolve parsing using already scanned shops/items if available
             const parsedDispatches = extractDispatches(rawRows, tempShops, tempItems);
             tempDispatches = [...tempDispatches, ...parsedDispatches];
             logs.push(`   ↳ Auto-Map matched to "Daily Disbursement" (Generated: ${parsedDispatches.length} dispatch trip registers)`);
-          } else {
-            // Fallback heuristics: check if single sheet layout contains everything parsed as shops or items
-            if (headers.some(h => h.toLowerCase().includes('rate'))) {
-              const parsed = extractItems(rawRows);
-              tempItems = [...tempItems, ...parsed];
-              logs.push(`   ↳ Generic Fallback: parsed as Items list (${parsed.length} sweet catalog items)`);
-            } else {
-              const parsed = extractShops(rawRows);
-              tempShops = [...tempShops, ...parsed];
-              logs.push(`   ↳ Generic Fallback: parsed as Shops registry (${parsed.length} outlines)`);
-            }
           }
+        });
+
+        // Resolve unknown items or shops if those sheets were out of order
+        tempDispatches.forEach(d => {
+          const matchedShop = tempShops.find(s => s.name.toLowerCase() === d.shopName.toLowerCase());
+          if (matchedShop) {
+            d.shopId = matchedShop.id;
+            d.shopName = matchedShop.name;
+          }
+          d.items.forEach(itm => {
+            const matchedItem = tempItems.find(i => i.name.toLowerCase() === itm.sweetItemName.toLowerCase());
+            if (matchedItem) {
+              itm.sweetItemId = matchedItem.id;
+              itm.sweetItemName = matchedItem.name;
+            }
+          });
         });
 
         setDetectedShops(tempShops);

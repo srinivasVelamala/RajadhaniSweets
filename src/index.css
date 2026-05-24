@@ -1,65 +1,331 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
-
-  /* Redefine Slate color coordinates to high-contrast Light/Ice-Blue and charcoal theme specs */
-  --color-white: #0f172a; /* Redefine white text variables for excellent dark contrast */
-  --color-slate-100: #0f172a; /* Title and heavy text */
-  --color-slate-200: #1e3a8a; /* Deep Royal/Navy Blue headings */
-  --color-slate-201: #1e40af; 
-  --color-slate-205: #1e3a8a;
-  --color-slate-300: #1e293b; /* Body and heavy info labels */
-  --color-slate-350: #192231;
-  --color-slate-400: #334155; /* Regular body description text */
-  --color-slate-450: #475569;
-  --color-slate-500: #475569; /* Soft labels */
-  --color-slate-550: #64748b;
-  --color-slate-600: #64748b;
-  --color-slate-650: #94a3b8;
-  --color-slate-700: #94a3b8; /* Outlines/grid lines */
-  --color-slate-800: #cbd5e1; /* Subtle divider borders */
-  --color-slate-850: #f1f5f9; /* Light panels highlight/form inputs background */
-  --color-slate-900: #ffffff; /* Squeaky clean pure white paper cards and sidebar */
-  --color-slate-950: #f8fafc; /* Beautiful soft Ice-Blue canvas background */
-
-  /* Map Amber coordinates to Brilliant Royal/Sky Blue accent highlights */
-  --color-amber-100: #dbeafe;
-  --color-amber-200: #93c5fd;
-  --color-amber-305: #60a5fa;
-  --color-amber-400: #3b82f6; /* Accent skies */
-  --color-amber-500: #2563eb; /* Classic Royal Blue triggers and buttons */
-  --color-amber-550: #1d4ed8;
-  --color-amber-600: #1d4ed8; /* Darker royal blue on button active triggers */
 }
 
-/* Base resets & custom typography scrollbars */
-html {
+/* --- LIGHT WHITE & ROYAL BLUE ENTERPRISE THEME --- */
+
+html, body {
   font-family: var(--font-sans);
-  background-color: var(--color-slate-950);
+  background-color: #f0f7ff !important; /* Soft ice-blue background */
+  color: #1e293b !important; /* Elegant dark slate black */
 }
 
-/* Webkit scrollbars styling for modern clean light panels */
+/* Override dark screen container wrappers */
+.min-h-screen.bg-slate-950,
+.min-h-screen {
+  background-color: #f0f7ff !important;
+}
+
+/* Standard cards mapping to pristine white panels with blue-slate borders */
+.bg-slate-900,
+.bg-slate-900\/60,
+.bg-slate-950\/80,
+.bg-slate-950 {
+  background-color: #ffffff !important;
+  border-color: #bfdbfe !important;
+  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.05), 0 2px 4px -2px rgba(59, 130, 246, 0.05) !important;
+}
+
+/* Blur backgrounds for tables/bars */
+.backdrop-blur-md,
+.backdrop-blur-sm {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Dividers & Borders matching light blue rules */
+.border-slate-800,
+.border-slate-850,
+.border-slate-900,
+.divide-slate-800,
+.divide-slate-850 {
+  border-color: #dbeafe !important;
+}
+
+/* Neutral Slate text color overrides for massive white contrast */
+.text-white,
+.text-slate-100,
+.text-slate-200 {
+  color: #0f172a !important; /* Strong dark navy */
+}
+
+.text-slate-300,
+.text-slate-400 {
+  color: #334155 !important; /* Slate steel */
+}
+
+.text-slate-500,
+.text-slate-550,
+.text-slate-650,
+.text-slate-600 {
+  color: #475569 !important; /* Charcoal subtexts */
+}
+
+/* Highlight primary colors from yellow/amber to Royal Blue */
+.text-amber-500,
+.text-amber-400 {
+  color: #2563eb !important; /* Pure corporate Blue */
+}
+
+/* Primary actions buttons (e.g. create, update, save) matching Royal Blue */
+button.bg-amber-500,
+.bg-amber-500 {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+  border: none !important;
+  font-weight: 600 !important;
+}
+
+button.bg-amber-500:hover,
+.bg-amber-500:hover {
+  background-color: #1d4ed8 !important;
+}
+
+button.bg-amber-500 .text-slate-950 {
+  color: #ffffff !important;
+}
+
+/* Secondary Actions mapping to Soft Blue highlight */
+button.bg-slate-800,
+.bg-slate-800 {
+  background-color: #eff6ff !important;
+  color: #2563eb !important;
+  border: 1px solid #bfdbfe !important;
+}
+
+button.bg-slate-800:hover,
+.bg-slate-800:hover {
+  background-color: #dbeafe !important;
+  color: #1e40af !important;
+}
+
+/* Input Fields & Textareas matching white aesthetics */
+input, 
+select, 
+textarea {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid #bfdbfe !important;
+  border-radius: 0.5rem !important;
+  padding: 0.5rem 0.75rem !important;
+}
+
+input:focus, 
+select:focus, 
+textarea:focus {
+  outline: none !important;
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15) !important;
+}
+
+/* Real-Time Alert tickers overrides */
+.bg-amber-500\/10 {
+  background-color: #eff6ff !important;
+  border: 1px solid #bfdbfe !important;
+}
+
+.text-amber-550 {
+  color: #1d4ed8 !important;
+}
+
+/* Warning alert badges */
+.text-amber-400 {
+  color: #2563eb !important;
+}
+
+/* Vibrant indicators (e.g. online, registered, synced) */
+.text-emerald-400,
+.text-emerald-500 {
+  color: #059669 !important; /* Crisp, accessible Emerald Green */
+}
+
+.bg-emerald-500\/10,
+.bg-emerald-500\/20 {
+  background-color: #ecfdf5 !important;
+  border: 1px solid #a7f3d0 !important;
+}
+
+.bg-emerald-500 {
+  background-color: #10b981 !important;
+}
+
+/* Error/Defect alerts mapping to soft Red */
+.text-rose-450,
+.text-rose-400,
+.text-red-400 {
+  color: #ef4444 !important;
+}
+
+.bg-rose-500\/10,
+.bg-red-500\/10 {
+  background-color: #fef2f2 !important;
+  border: 1px solid #fecaca !important;
+}
+
+/* Custom indicator items */
+.text-indigo-400 {
+  color: #4f46e5 !important;
+}
+
+.bg-indigo-500\/10 {
+  background-color: #f5f3ff !important;
+  border: 1px solid #ddd6fe !important;
+}
+
+/* --- SIDEBAR CUSTOMIZATION: WHITE BACKGROUND WITH BLUE NAVIGATION CONTRASTS --- */
+
+aside,
+.fixed.lg\:hidden {
+  background-color: #ffffff !important; /* Solid pristine white */
+  border-right: 1px solid #dbeafe !important;
+}
+
+aside .text-white,
+aside h1,
+aside span {
+  color: #1e293b !important;
+}
+
+aside p.text-amber-500 {
+  color: #2563eb !important;
+}
+
+/* Sidebar item buttons overrides */
+aside button {
+  color: #475569 !important;
+  background-color: transparent !important;
+}
+
+aside button:hover {
+  background-color: #f0f7ff !important; /* Light sky blue hover */
+  color: #2563eb !important;
+}
+
+/* Sidebar active highlight selection bubble */
+aside button.bg-amber-500 {
+  background-color: #2563eb !important; /* Corporate Royal Blue active action */
+  color: #ffffff !important;
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2) !important;
+}
+
+aside button.bg-amber-500 .text-slate-950,
+aside button.bg-amber-500 span,
+aside button.bg-amber-500 svg {
+  color: #ffffff !important;
+}
+
+/* Navigation badge colors */
+aside .bg-slate-950.text-amber-500 {
+  background-color: #eff6ff !important;
+  color: #2563eb !important;
+}
+
+/* Sidebar settings divider & background box footer */
+aside .bg-slate-950\/40 {
+  background-color: #f8fafc !important;
+  border-top: 1px solid #e2e8f0 !important;
+}
+
+aside label.text-slate-550,
+aside label {
+  color: #64748b !important;
+}
+
+aside .bg-slate-900 {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+}
+
+aside .bg-slate-900 button {
+  color: #475569 !important;
+}
+
+aside .bg-slate-900 button.bg-slate-800 {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+aside .text-slate-600 {
+  color: #94a3b8 !important;
+}
+
+aside div.bg-amber-500 {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+}
+
+/* --- ACCENTED METRIC CARDS AND CHIP LAYOUTS --- */
+
+.bg-slate-950\/70 {
+  background-color: #f8fafc !important;
+  border: 1px solid #bfdbfe !important;
+  color: #1e293b !important;
+}
+
+.text-xs.font-semibold.px-2.py-0.5.rounded.bg-slate-950 {
+  background-color: #eff6ff !important;
+  color: #2563eb !important;
+  font-weight: 600 !important;
+}
+
+/* Footer layout */
+footer {
+  border-top-color: #dbeafe !important;
+  color: #64748b !important;
+}
+
+/* --- DATA TABLE GLOBAL ACCENT OVERRIDES --- */
+
+table {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  background-color: #ffffff !important;
+}
+
+table th {
+  background-color: #eff6ff !important; /* Soft header blue */
+  color: #1e3a8a !important; /* Pristine navy blue text */
+  font-weight: 600 !important;
+  border-bottom: 2px solid #bfdbfe !important;
+  text-transform: uppercase !important;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.05em !important;
+}
+
+table td {
+  border-bottom: 1px solid #e2e8f0 !important;
+  color: #334155 !important;
+  background-color: #ffffff !important;
+}
+
+table tr:hover td {
+  background-color: #f8fafc !important; /* Delicate row highlight hover */
+}
+
+/* Custom scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-slate-950);
+  background: #f0f7ff;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-slate-800);
+  background: #cbd5e1;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-slate-700);
+  background: #cbd5e1;
 }
 
-/* Micro-interaction animation utilities */
+/* Micro-interaction animations */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -70,31 +336,10 @@ html {
   to { transform: translateY(0); opacity: 1; }
 }
 
-@keyframes pulseBorder {
-  0%, 100% { border-color: rgba(37, 99, 235, 0.2); }
-  50% { border-color: rgba(37, 99, 235, 0.5); }
-}
-
 .animate-fade-in {
   animation: fadeIn 0.4s ease-out forwards;
 }
 
 .animate-slide-up {
   animation: slideUp 0.3s ease-out forwards;
-}
-
-.animate-border-pulse {
-  animation: pulseBorder 2s infinite ease-in-out;
-}
-
-@media print {
-  .print\:hidden {
-    display: none !important;
-  }
-  .print\:p-0 {
-    padding: 0 !important;
-  }
-  .print\:m-0 {
-    margin: 0 !important;
-  }
 }

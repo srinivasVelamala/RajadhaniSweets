@@ -26,7 +26,7 @@ export default function Sidebar({
     { id: 'shops', name: 'Shop Master', icon: Store },
     { id: 'items', name: 'Item Master', icon: Candy },
     { id: 'production', name: 'Daily Production', icon: Flame },
-    { id: 'migration', name: 'Excel Migration', icon: FileSpreadsheet },
+    { id: 'excel', name: 'Excel Migration', icon: FileSpreadsheet },
     { id: 'reports', name: 'Export Reports', icon: FileBarChart },
     { id: 'desktop', name: 'Desktop Dist Kit', icon: Terminal, highlight: true }
   ];

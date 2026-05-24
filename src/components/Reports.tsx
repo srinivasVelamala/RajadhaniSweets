@@ -266,7 +266,7 @@ export default function Reports({
                       <td className="p-3 font-semibold text-slate-200">{d.shopName}</td>
                       <td className="p-3 text-center text-slate-400">{d.items.length} items cataloged</td>
                       <td className="p-3 text-center">{d.items.reduce((s, itm) => s + itm.netWeight, 0).toFixed(1)} Kg</td>
-                      <td className="p-3 text-right font-bold text-white">₹ {d.totalAmount.toLocaleString()}</td>
+                      <td className="p-3 text-right font-bold text-white">₹ {d.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -416,7 +416,7 @@ export default function Reports({
                         <td className="p-3">{d.date}</td>
                         <td className="p-3 text-slate-200 font-semibold">{d.shopName}</td>
                         <td className="p-3 text-center text-slate-450">{d.items.length} items logged</td>
-                        <td className="p-3 text-right font-bold text-white">₹ {d.totalAmount.toLocaleString()}</td>
+                        <td className="p-3 text-right font-bold text-white">₹ {d.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                       </tr>
                     ))}
                 </tbody>

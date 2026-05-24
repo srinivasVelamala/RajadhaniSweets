@@ -300,7 +300,7 @@ export default function App() {
       )}
 
       {/* MAIN SCREEN CANVAS AREA */}
-      <div className="flex-grow flex flex-col min-w-0 max-w-7xl mx-auto px-4 lg:px-8 py-5 min-h-screen space-y-6">
+      <div className="flex-grow flex flex-col min-w-0 px-4 lg:px-8 py-5 min-h-screen space-y-6 w-full">
         
         {/* TOP COMPREHENSIVE HEADER RESPONSIVE METRIC RAIL */}
         <header className="flex items-center justify-between bg-slate-900/60 backdrop-blur-md border border-slate-800 p-4 rounded-xl print:hidden">
