@@ -182,16 +182,8 @@ export default function App() {
         return merged;
       });
 
-      // Merge shops (by name)
-      setShops(prev => {
-        const merged = [...prev];
-        (data.shops as Shop[]).forEach((ns: Shop) => {
-          if (!merged.some(s => s.name.toLowerCase() === ns.name.toLowerCase())) {
-            merged.push(ns);
-          }
-        });
-        return merged;
-      });
+      // Replace shops entirely with what's in the Excel file
+      setShops(data.shops as Shop[]);
 
       // Replace production entries for that date, then add synced ones
       setProduction(prev => {
