@@ -1,19 +1,16 @@
 import { useState, useEffect } from 'react';
 import { 
-  Menu, Sparkles, BrainCircuit, ShieldAlert, CheckCircle2, UserCheck, Bell, Info 
+  Menu, Bell, UserCheck
 } from 'lucide-react';
 
-// Import datasets
 import { 
   INITIAL_SHOPS, INITIAL_SWEETS, INITIAL_PRODUCTION, INITIAL_TRIPS, INITIAL_INVENTORY, INITIAL_EXPENSES, INITIAL_WORKERS 
 } from './data';
 
-// Import interfaces
 import { 
   Shop, SweetItem, ProductionEntry, TripEntry, InventoryItem, Expense, Worker, Notification 
 } from './types';
 
-// Import UI sub-modules
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import Shops from './components/Shops';
@@ -26,13 +23,30 @@ import Workers from './components/Workers';
 import ExcelMigration from './components/ExcelMigration';
 import Reports from './components/Reports';
 
+const SWEET_PARTICLES = [
+  { emoji: '🍬', x: 4,  y: 8,  size: 2.8, dur: 9,  delay: 0 },
+  { emoji: '🧁', x: 14, y: 22, size: 2.4, dur: 13, delay: 1.5 },
+  { emoji: '🍭', x: 25, y: 55, size: 3.0, dur: 11, delay: 3 },
+  { emoji: '🎂', x: 36, y: 10, size: 2.2, dur: 15, delay: 0.8 },
+  { emoji: '🍮', x: 48, y: 70, size: 2.6, dur: 10, delay: 2.2 },
+  { emoji: '🍬', x: 58, y: 35, size: 3.2, dur: 14, delay: 4 },
+  { emoji: '🧁', x: 68, y: 80, size: 2.0, dur: 12, delay: 1 },
+  { emoji: '🍭', x: 76, y: 18, size: 2.8, dur: 8,  delay: 3.5 },
+  { emoji: '🍩', x: 84, y: 60, size: 2.4, dur: 16, delay: 0.5 },
+  { emoji: '🎂', x: 92, y: 42, size: 2.6, dur: 11, delay: 2.8 },
+  { emoji: '🍫', x: 8,  y: 75, size: 2.2, dur: 13, delay: 1.8 },
+  { emoji: '🍩', x: 20, y: 88, size: 3.0, dur: 9,  delay: 4.5 },
+  { emoji: '🍮', x: 44, y: 40, size: 2.4, dur: 12, delay: 0.3 },
+  { emoji: '🍫', x: 72, y: 50, size: 2.8, dur: 10, delay: 3.2 },
+  { emoji: '🍬', x: 88, y: 88, size: 2.2, dur: 14, delay: 2 },
+];
+
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [userRole, setUserRole] = useState<'Admin' | 'Operator'>('Admin');
   const [fastEntryMode, setFastEntryMode] = useState<boolean>(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
 
-  // Core local states database with persistent LocalStorage mirrors
   const [shops, setShops] = useState<Shop[]>(() => {
     const saved = localStorage.getItem('rajdhani_shops_v_excel_v5_today');
     return saved ? JSON.parse(saved) : INITIAL_SHOPS;
@@ -62,37 +76,18 @@ export default function App() {
     return saved ? JSON.parse(saved) : INITIAL_WORKERS;
   });
 
-  // Keep LocalStorage databases fully persistent
-  useEffect(() => {
-    localStorage.setItem('rajdhani_shops_v_excel_v5_today', JSON.stringify(shops));
-  }, [shops]);
-  useEffect(() => {
-    localStorage.setItem('rajdhani_items_v_excel_v5_today', JSON.stringify(items));
-  }, [items]);
-  useEffect(() => {
-    localStorage.setItem('rajdhani_production_v_excel_v5_today', JSON.stringify(production));
-  }, [production]);
-  useEffect(() => {
-    localStorage.setItem('rajdhani_dispatches_v_excel_v5_today', JSON.stringify(dispatches));
-  }, [dispatches]);
-  useEffect(() => {
-    localStorage.setItem('rajdhani_inventory_v_excel_v5_today', JSON.stringify(inventory));
-  }, [inventory]);
-  useEffect(() => {
-    localStorage.setItem('rajdhani_expenses_v_excel_v5_today', JSON.stringify(expenses));
-  }, [expenses]);
-  useEffect(() => {
-    localStorage.setItem('rajdhani_workers_v_excel_v5_today', JSON.stringify(workers));
-  }, [workers]);
+  useEffect(() => { localStorage.setItem('rajdhani_shops_v_excel_v5_today',      JSON.stringify(shops));      }, [shops]);
+  useEffect(() => { localStorage.setItem('rajdhani_items_v_excel_v5_today',      JSON.stringify(items));      }, [items]);
+  useEffect(() => { localStorage.setItem('rajdhani_production_v_excel_v5_today', JSON.stringify(production)); }, [production]);
+  useEffect(() => { localStorage.setItem('rajdhani_dispatches_v_excel_v5_today', JSON.stringify(dispatches)); }, [dispatches]);
+  useEffect(() => { localStorage.setItem('rajdhani_inventory_v_excel_v5_today',  JSON.stringify(inventory));  }, [inventory]);
+  useEffect(() => { localStorage.setItem('rajdhani_expenses_v_excel_v5_today',   JSON.stringify(expenses));   }, [expenses]);
+  useEffect(() => { localStorage.setItem('rajdhani_workers_v_excel_v5_today',    JSON.stringify(workers));    }, [workers]);
 
-  // System alert notifications
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
-  // Periodically generate notifications for realism (low stock, debtors and pending dispatches)
   useEffect(() => {
     const list: Notification[] = [];
-    
-    // Low stock checks
     inventory.forEach(item => {
       if (item.remainingStock <= item.lowStockAlertLevel) {
         list.push({
@@ -105,8 +100,6 @@ export default function App() {
         });
       }
     });
-
-    // Outstanding dues checks
     shops.forEach(sh => {
       if (sh.outstandingBalance > 5000) {
         list.push({
@@ -119,140 +112,83 @@ export default function App() {
         });
       }
     });
-
     setNotifications(list);
   }, [inventory, shops, dispatches.length]);
 
-  // STATE MANIPULATORS
-  
-  // Shops Master manipulation
   const handleAddShop = (newShop: Omit<Shop, 'id' | 'outstandingBalance'>) => {
-    const created: Shop = {
-      ...newShop,
-      id: `SH-${Date.now()}`,
-      outstandingBalance: 0
-    };
-    setShops([created, ...shops]);
+    setShops([{ ...newShop, id: `SH-${Date.now()}`, outstandingBalance: 0 }, ...shops]);
   };
+  const handleUpdateShop = (updated: Shop) => setShops(shops.map(s => s.id === updated.id ? updated : s));
 
-  const handleUpdateShop = (updated: Shop) => {
-    setShops(shops.map(s => s.id === updated.id ? updated : s));
-  };
-
-  // Sweets Catalog manipulation
   const handleAddItem = (newItem: Omit<SweetItem, 'id'>) => {
-    const created: SweetItem = {
-      ...newItem,
-      id: `SW-${Date.now()}`
-    };
-    setItems([created, ...items]);
+    setItems([{ ...newItem, id: `SW-${Date.now()}` }, ...items]);
   };
+  const handleUpdateItem = (updated: SweetItem) => setItems(items.map(it => it.id === updated.id ? updated : it));
 
-  const handleUpdateItem = (updated: SweetItem) => {
-    setItems(items.map(it => it.id === updated.id ? updated : it));
-  };
-
-  // Morning production entry
   const handleAddProduction = (newEntry: Omit<ProductionEntry, 'id'>) => {
-    const created: ProductionEntry = {
-      ...newEntry,
-      id: `PR-${Date.now()}`
-    };
-    setProduction([created, ...production]);
+    setProduction([{ ...newEntry, id: `PR-${Date.now()}` }, ...production]);
   };
-
   const handleSaveBulkProduction = (date: string, entries: Omit<ProductionEntry, 'id'>[]) => {
     const withoutDate = production.filter(p => p.date !== date);
-    const withIds = entries.map((e, idx) => ({
-      ...e,
-      id: `PR-${date}-${Date.now()}-${idx}`
-    }));
+    const withIds = entries.map((e, idx) => ({ ...e, id: `PR-${date}-${Date.now()}-${idx}` }));
     setProduction([...withIds, ...withoutDate]);
   };
 
-  // Core Dispatch Trip entry & adjusting Shop outstanding balances automatically!
   const handleAddDispatch = (newTrip: Omit<TripEntry, 'id'>) => {
-    const created: TripEntry = {
-      ...newTrip,
-      id: `TR-${Date.now()}`
-    };
-
+    const created: TripEntry = { ...newTrip, id: `TR-${Date.now()}` };
     setDispatches([created, ...dispatches]);
-
-    // Automatically increase outstanding balance of the receiving shop
-    setShops(shops.map(sh => {
-      if (sh.id === newTrip.shopId) {
-        return {
-          ...sh,
-          outstandingBalance: sh.outstandingBalance + newTrip.totalAmount
-        };
-      }
-      return sh;
-    }));
+    setShops(shops.map(sh => sh.id === newTrip.shopId
+      ? { ...sh, outstandingBalance: sh.outstandingBalance + newTrip.totalAmount }
+      : sh
+    ));
   };
+  const handleUpdateDispatch = (updated: TripEntry) => setDispatches(dispatches.map(d => d.id === updated.id ? updated : d));
+  const handleUpdateInventory = (updated: InventoryItem) => setInventory(inventory.map(inv => inv.id === updated.id ? updated : inv));
 
-  const handleUpdateDispatch = (updated: TripEntry) => {
-    setDispatches(dispatches.map(d => d.id === updated.id ? updated : d));
-  };
-
-  // Inventory adjustment
-  const handleUpdateInventory = (updated: InventoryItem) => {
-    setInventory(inventory.map(inv => inv.id === updated.id ? updated : inv));
-  };
-
-  // Expense Logger
   const handleAddExpense = (newExpense: Omit<Expense, 'id'>) => {
-    const created: Expense = {
-      ...newExpense,
-      id: `EX-${Date.now()}`
-    };
-    setExpenses([created, ...expenses]);
+    setExpenses([{ ...newExpense, id: `EX-${Date.now()}` }, ...expenses]);
   };
 
-  // Workers registration
   const handleAddWorker = (newWorker: Omit<Worker, 'id' | 'attendance' | 'payments'>) => {
-    const created: Worker = {
-      ...newWorker,
-      id: `WK-${Date.now()}`,
-      attendance: {},
-      payments: []
-    };
-    setWorkers([created, ...workers]);
+    setWorkers([{ ...newWorker, id: `WK-${Date.now()}`, attendance: {}, payments: [] }, ...workers]);
   };
+  const handleUpdateWorker = (updated: Worker) => setWorkers(workers.map(w => w.id === updated.id ? updated : w));
 
-  const handleUpdateWorker = (updated: Worker) => {
-    setWorkers(workers.map(w => w.id === updated.id ? updated : w));
-  };
-
-  // Legacy Excel Sheet import reconciliations
   const handleExcelImportCompleted = (importedShops: Shop[], importedItems: SweetItem[], importedDispatches: TripEntry[]) => {
-    // Merge without duplication based on names
     const mergedShops = [...shops];
-    importedShops.forEach(nSh => {
-      if (!mergedShops.some(s => s.name.toLowerCase() === nSh.name.toLowerCase())) {
-        mergedShops.push(nSh);
-      }
-    });
-
+    importedShops.forEach(nSh => { if (!mergedShops.some(s => s.name.toLowerCase() === nSh.name.toLowerCase())) mergedShops.push(nSh); });
     const mergedItems = [...items];
-    importedItems.forEach(nIt => {
-      if (!mergedItems.some(i => i.name.toLowerCase() === nIt.name.toLowerCase())) {
-        mergedItems.push(nIt);
-      }
-    });
-
-    const mergedDispatches = [...importedDispatches, ...dispatches];
-
+    importedItems.forEach(nIt => { if (!mergedItems.some(i => i.name.toLowerCase() === nIt.name.toLowerCase())) mergedItems.push(nIt); });
     setShops(mergedShops);
     setItems(mergedItems);
-    setDispatches(mergedDispatches);
+    setDispatches([...importedDispatches, ...dispatches]);
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans flex antialiased selection:bg-amber-500 selection:text-slate-950">
-      
-      {/* SIDEBAR NAVIGATION REGION (Desktop) */}
-      <div className="hidden lg:block w-64 shrink-0 h-screen sticky top-0 bg-slate-900 border-r border-slate-800 z-20">
+    <div className="min-h-screen font-sans flex antialiased" style={{ background: '#fdf6ee', position: 'relative', overflow: 'hidden' }}>
+
+      {/* ── Decorative sweet background particles ── */}
+      <div className="sweet-bg" aria-hidden="true">
+        <div className="sweet-bg::before" />
+        {SWEET_PARTICLES.map((p, i) => (
+          <span
+            key={i}
+            className="sweet-particle"
+            style={{
+              left: `${p.x}%`,
+              top: `${p.y}%`,
+              fontSize: `${p.size}rem`,
+              animationDuration: `${p.dur}s`,
+              animationDelay: `${p.delay}s`,
+            }}
+          >
+            {p.emoji}
+          </span>
+        ))}
+      </div>
+
+      {/* ── Desktop Sidebar ── */}
+      <div className="hidden lg:block w-64 shrink-0 h-screen sticky top-0 z-20 shadow-2xl">
         <Sidebar 
           currentTab={activeTab} 
           setCurrentTab={setActiveTab} 
@@ -263,99 +199,104 @@ export default function App() {
         />
       </div>
 
-      {/* MOBILE COLLAPSIBLE NAVIGATION CONTAINER */}
+      {/* ── Mobile Menu ── */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 flex lg:hidden bg-slate-950/90 backdrop-blur-sm animate-fade-in">
-          <div className="w-72 bg-slate-900 border-r border-slate-800 flex flex-col justify-between h-screen overflow-y-auto">
-            <div className="flex flex-col h-full justify-between">
-              <div className="p-4 border-b border-slate-800 flex items-center justify-between shrink-0">
-                <span className="text-xs font-bold text-amber-500 uppercase font-mono tracking-wider flex items-center gap-2">
-                  Navigation Menu
-                </span>
-                <button 
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="p-1 hover:bg-slate-850 rounded text-xs text-amber-500 font-mono font-bold hover:text-white"
-                >
-                  [CLOSE]
-                </button>
-              </div>
-
-              <div className="flex-1 min-h-0">
-                <Sidebar 
-                  currentTab={activeTab} 
-                  setCurrentTab={(tab) => {
-                    setActiveTab(tab);
-                    setMobileMenuOpen(false);
-                  }} 
-                  userRole={userRole} 
-                  setUserRole={setUserRole}
-                  fastEntryMode={fastEntryMode}
-                  setFastEntryMode={setFastEntryMode}
-                />
-              </div>
+        <div className="fixed inset-0 z-50 flex lg:hidden" style={{ background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(4px)' }}>
+          <div className="w-72 h-screen shadow-2xl overflow-y-auto">
+            <div className="p-4 flex items-center justify-end" style={{ background: 'rgba(0,0,0,0.3)' }}>
+              <button 
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-xs font-mono font-bold px-3 py-1 rounded border text-yellow-200 border-yellow-300/30 hover:bg-white/10 transition"
+              >
+                [CLOSE]
+              </button>
+            </div>
+            <div className="h-[calc(100vh-52px)]">
+              <Sidebar 
+                currentTab={activeTab} 
+                setCurrentTab={(tab) => { setActiveTab(tab); setMobileMenuOpen(false); }} 
+                userRole={userRole} 
+                setUserRole={setUserRole}
+                fastEntryMode={fastEntryMode}
+                setFastEntryMode={setFastEntryMode}
+              />
             </div>
           </div>
-          <div className="flex-1" onClick={() => setMobileMenuOpen(false)}></div>
+          <div className="flex-1" onClick={() => setMobileMenuOpen(false)} />
         </div>
       )}
 
-      {/* MAIN SCREEN CANVAS AREA */}
-      <div className="flex-grow flex flex-col min-w-0 max-w-7xl mx-auto px-4 lg:px-8 py-5 min-h-screen space-y-6">
+      {/* ── Main Content ── */}
+      <div className="flex-grow flex flex-col min-w-0 max-w-7xl mx-auto px-4 lg:px-8 py-5 min-h-screen space-y-5 relative z-10">
         
-        {/* TOP COMPREHENSIVE HEADER RESPONSIVE METRIC RAIL */}
-        <header className="flex items-center justify-between bg-slate-900/60 backdrop-blur-md border border-slate-800 p-4 rounded-xl print:hidden">
+        {/* ── Top Header ── */}
+        <header className="flex items-center justify-between px-5 py-3.5 rounded-2xl print:hidden"
+          style={{
+            background: 'rgba(255,255,255,0.78)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255,255,255,0.9)',
+            boxShadow: '0 4px 24px rgba(30,58,138,0.08), 0 1px 4px rgba(0,0,0,0.04)'
+          }}
+        >
           <div className="flex items-center gap-3">
             <button 
               onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden p-1.5 hover:bg-slate-800 text-slate-300 rounded cursor-pointer"
+              className="lg:hidden p-1.5 rounded-lg transition hover:bg-slate-100 text-slate-500"
             >
               <Menu className="w-5 h-5" />
             </button>
             <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold px-2 py-0.5 rounded bg-slate-950 text-slate-500 font-mono uppercase tracking-wider">
+              <div className="flex items-center gap-2 mb-0.5">
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full font-mono uppercase tracking-wider"
+                  style={{ background: 'linear-gradient(135deg,#dbeafe,#bfdbfe)', color: '#1e40af' }}>
                   Live Operations
                 </span>
-                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping"></span>
+                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping inline-block"></span>
               </div>
-              <h1 className="text-lg font-bold text-white mb-0 flex items-center gap-2 mt-0.5">
+              <h1 className="text-base font-bold leading-tight flex items-center gap-1.5" style={{ color: '#1e3a8a' }}>
                 Rajdhani Sweets
-                <span className="text-xs font-mono font-normal text-slate-500">(SQLite Active)</span>
+                <span className="text-[11px] font-mono font-normal" style={{ color: '#94a3b8' }}>(SQLite Active)</span>
               </h1>
             </div>
           </div>
 
-          <div className="flex items-center gap-4.5 font-mono text-xs text-slate-400">
-            {/* Active notifications indicator badge */}
+          <div className="flex items-center gap-3 font-mono text-xs">
             {notifications.length > 0 && (
-              <div className="flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-lg text-amber-400">
-                <Bell className="w-4 h-4 text-amber-550 animate-bounce" />
-                <span className="font-bold">{notifications.length} Alerts</span>
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-amber-700"
+                style={{ background: 'linear-gradient(135deg,#fef9c3,#fde68a)', border: '1px solid rgba(245,158,11,0.3)', boxShadow: '0 2px 8px rgba(245,158,11,0.15)' }}>
+                <Bell className="w-3.5 h-3.5 animate-bounce" />
+                <span className="font-bold text-[11px]">{notifications.length} Alerts</span>
               </div>
             )}
-
-            {/* Current user role authorization bubble */}
-            <div className="hidden sm:flex items-center gap-2 bg-slate-950/70 py-1.5 px-3 rounded-lg border border-slate-800">
-              <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Auth: <span className="text-slate-200 font-bold uppercase">{userRole}</span></span>
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl"
+              style={{ background: 'linear-gradient(135deg,#f0fdf4,#dcfce7)', border: '1px solid rgba(34,197,94,0.25)' }}>
+              <UserCheck className="w-3.5 h-3.5 text-emerald-600" />
+              <span style={{ color: '#475569' }}>Auth: <span className="font-bold text-emerald-700 uppercase">{userRole}</span></span>
             </div>
           </div>
         </header>
 
-        {/* ALERTS TICKER EXPANDED IF ACTIVE */}
+        {/* ── Alert Ticker ── */}
         {notifications.length > 0 && activeTab === 'dashboard' && (
-          <div className="bg-slate-900 border border-amber-500/10 p-4 rounded-xl space-y-2.5 print:hidden">
-            <h4 className="text-[10.5px] uppercase font-mono tracking-widest text-amber-500 font-bold flex items-center gap-1.5 mb-1.5">
-              <ShieldAlert className="w-4 h-4 text-amber-500" />
-              Operational Alert Warnings ({notifications.length})
+          <div className="rounded-2xl p-4 space-y-2.5 print:hidden animate-slide-up"
+            style={{
+              background: 'rgba(255,255,255,0.75)',
+              backdropFilter: 'blur(16px)',
+              border: '1px solid rgba(245,158,11,0.25)',
+              boxShadow: '0 2px 12px rgba(245,158,11,0.08)'
+            }}>
+            <h4 className="text-[10.5px] uppercase font-mono tracking-widest font-bold flex items-center gap-1.5 mb-1.5" style={{ color: '#b45309' }}>
+              ⚠️ Operational Alerts ({notifications.length})
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {notifications.slice(0, 4).map((n) => (
-                <div key={n.id} className="p-2.5 bg-slate-950/80 rounded border border-slate-850 text-[11px] leading-relaxed flex gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0 mt-1.5"></div>
+                <div key={n.id} className="p-3 rounded-xl text-[11px] leading-relaxed flex gap-2.5"
+                  style={{ background: 'linear-gradient(135deg,#fffbeb,#fef3c7)', border: '1px solid rgba(245,158,11,0.2)' }}>
+                  <div className="w-2 h-2 rounded-full bg-amber-400 shrink-0 mt-1.5"></div>
                   <div>
-                    <span className="font-bold text-slate-200 block">{n.title}</span>
-                    <span className="text-slate-400 font-sans block">{n.message}</span>
+                    <span className="font-bold block" style={{ color: '#92400e' }}>{n.title}</span>
+                    <span className="block mt-0.5" style={{ color: '#78716c' }}>{n.message}</span>
                   </div>
                 </div>
               ))}
@@ -363,112 +304,46 @@ export default function App() {
           </div>
         )}
 
-        {/* ACTIVE MODULE VIEWPORT ROUTER */}
+        {/* ── Active Module Viewport ── */}
         <div className="flex-grow">
           {activeTab === 'dashboard' && (
-            <Dashboard 
-              shops={shops} 
-              items={items} 
-              production={production} 
-              dispatches={dispatches} 
-              expenses={expenses}
-              onNavigate={setActiveTab}
-            />
+            <Dashboard shops={shops} items={items} production={production} dispatches={dispatches} expenses={expenses} onNavigate={setActiveTab} />
           )}
-
           {activeTab === 'shops' && (
-            <Shops 
-              shops={shops} 
-              onAddShop={handleAddShop} 
-              onUpdateShop={handleUpdateShop}
-              onSyncShops={setShops}
-              userRole={userRole}
-            />
+            <Shops shops={shops} onAddShop={handleAddShop} onUpdateShop={handleUpdateShop} onSyncShops={setShops} userRole={userRole} />
           )}
-
           {activeTab === 'items' && (
-            <Items 
-              items={items} 
-              onAddItem={handleAddItem} 
-              onUpdateItem={handleUpdateItem}
-              userRole={userRole}
-            />
+            <Items items={items} onAddItem={handleAddItem} onUpdateItem={handleUpdateItem} userRole={userRole} />
           )}
-
           {activeTab === 'production' && (
-            <DailyProduction 
-              production={production} 
-              items={items} 
-              dispatches={dispatches}
-              shops={shops}
-              onAddProduction={handleAddProduction}
-              onSaveBulkProduction={handleSaveBulkProduction}
-              onAddDispatch={handleAddDispatch}
-              onUpdateDispatch={handleUpdateDispatch}
-              userRole={userRole}
-            />
+            <DailyProduction production={production} items={items} dispatches={dispatches} shops={shops} onAddProduction={handleAddProduction} onSaveBulkProduction={handleSaveBulkProduction} onAddDispatch={handleAddDispatch} onUpdateDispatch={handleUpdateDispatch} userRole={userRole} />
           )}
-
           {activeTab === 'dispatches' && (
-            <Dispatches 
-              dispatches={dispatches} 
-              shops={shops} 
-              items={items} 
-              onAddDispatch={handleAddDispatch}
-              onUpdateDispatch={handleUpdateDispatch}
-              userRole={userRole}
-              fastEntryMode={fastEntryMode}
-            />
+            <Dispatches dispatches={dispatches} shops={shops} items={items} onAddDispatch={handleAddDispatch} onUpdateDispatch={handleUpdateDispatch} userRole={userRole} fastEntryMode={fastEntryMode} />
           )}
-
           {activeTab === 'inventory' && (
-            <Inventory 
-              inventory={inventory} 
-              onUpdateInventory={handleUpdateInventory}
-              userRole={userRole}
-            />
+            <Inventory inventory={inventory} onUpdateInventory={handleUpdateInventory} userRole={userRole} />
           )}
-
           {activeTab === 'expenses' && (
-            <Expenses 
-              expenses={expenses} 
-              onAddExpense={handleAddExpense}
-              userRole={userRole}
-            />
+            <Expenses expenses={expenses} onAddExpense={handleAddExpense} userRole={userRole} />
           )}
-
           {activeTab === 'workers' && (
-            <Workers 
-              workers={workers} 
-              onAddWorker={handleAddWorker}
-              onUpdateWorker={handleUpdateWorker}
-              userRole={userRole}
-            />
+            <Workers workers={workers} onAddWorker={handleAddWorker} onUpdateWorker={handleUpdateWorker} userRole={userRole} />
           )}
-
           {activeTab === 'excel' && (
-            <ExcelMigration 
-              onImportCompleted={handleExcelImportCompleted}
-            />
+            <ExcelMigration onImportCompleted={handleExcelImportCompleted} />
           )}
-
           {activeTab === 'reports' && (
-            <Reports 
-              shops={shops} 
-              items={items} 
-              production={production} 
-              dispatches={dispatches} 
-              expenses={expenses}
-            />
+            <Reports shops={shops} items={items} production={production} dispatches={dispatches} expenses={expenses} />
           )}
         </div>
 
-        {/* BOTTOM LEGAL MARGIN CREDITS RAIL (PRINT HIDDEN) */}
-        <footer className="pt-6 border-t border-slate-900 flex justify-between items-center text-[10px] text-slate-550 text-slate-500 font-mono print:hidden">
+        {/* ── Footer ── */}
+        <footer className="pt-4 flex justify-between items-center text-[10px] font-mono print:hidden"
+          style={{ borderTop: '1px solid rgba(30,58,138,0.08)', color: '#94a3b8' }}>
           <span>Rajdhani Sweets Enterprise Dashboard</span>
           <span>© 2026. SQLite Local Engine Active</span>
         </footer>
-
       </div>
     </div>
   );
