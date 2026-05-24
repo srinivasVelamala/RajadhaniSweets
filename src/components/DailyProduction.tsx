@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Flame, Plus, Search, Calendar, Award, Receipt, Percent, HelpCircle, Save, RotateCcw, FileSpreadsheet, List, ShieldAlert, CheckCircle2, ShoppingBag, ArrowRight, Copy, Scissors, Trash2, Sliders, CheckSquare, Info
+  Flame, Plus, Search, Calendar, Award, Receipt, Percent, HelpCircle, Save, RotateCcw, FileSpreadsheet, List, ShieldAlert, CheckCircle2, ShoppingBag, ArrowRight, Copy, Scissors, Trash2, Sliders, CheckSquare, Info, RefreshCw, Loader2
 } from 'lucide-react';
 import { ProductionEntry, SweetItem, TripEntry, Shop } from '../types';
 
@@ -147,6 +147,7 @@ interface DailyProductionProps {
   onSaveBulkProduction?: (date: string, entries: Omit<ProductionEntry, 'id'>[]) => void;
   onAddDispatch: (entry: Omit<TripEntry, 'id'>) => void;
   onUpdateDispatch: (entry: TripEntry) => void;
+  onSyncFromExcel?: () => Promise<{ added: number; date: string } | null>;
   userRole: 'Admin' | 'Operator';
 }
 
@@ -159,10 +160,26 @@ export default function DailyProduction({
   onSaveBulkProduction,
   onAddDispatch,
   onUpdateDispatch,
+  onSyncFromExcel,
   userRole
 }: DailyProductionProps) {
   const [selectedDate, setSelectedDate] = useState('2026-05-24');
-  
+  const [syncing, setSyncing] = useState(false);
+  const [syncResult, setSyncResult] = useState<{ added: number; date: string } | null>(null);
+
+  const handleExcelSync = async () => {
+    if (!onSyncFromExcel) return;
+    setSyncing(true);
+    setSyncResult(null);
+    const result = await onSyncFromExcel();
+    setSyncing(false);
+    if (result) {
+      setSyncResult(result);
+      setSelectedDate(result.date);
+      setTimeout(() => setSyncResult(null), 5000);
+    }
+  };
+
   // Selected tab: 'all' is Consolidated Kitchen Summary, others are shopIds
   const [selectedShopId, setSelectedShopId] = useState<string>('all');
   
@@ -694,18 +711,55 @@ export default function DailyProduction({
           </p>
         </div>
 
-        {/* DATE SELECTOR */}
-        <div className="flex items-center gap-3 bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 self-start md:self-auto shadow-inner">
-          <Calendar className="w-4 h-4 text-amber-500 shrink-0" />
-          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider font-mono">Date:</span>
-          <input
-            type="date"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            className="bg-slate-950 border border-slate-850 px-3 py-1 rounded text-sm text-amber-500 font-mono font-bold focus:outline-none"
-          />
+        <div className="flex items-center gap-3 self-start md:self-auto flex-wrap">
+          {/* SYNC FROM EXCEL BUTTON */}
+          {onSyncFromExcel && (
+            <button
+              onClick={handleExcelSync}
+              disabled={syncing}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all shadow-md disabled:opacity-60"
+              style={{
+                background: syncing ? '#e2e8f0' : 'linear-gradient(135deg,#16a34a,#15803d)',
+                color: syncing ? '#64748b' : '#fff',
+                boxShadow: syncing ? 'none' : '0 4px 14px rgba(22,163,74,0.3)'
+              }}
+            >
+              {syncing
+                ? <><Loader2 className="w-4 h-4 animate-spin" /> Syncing Excel...</>
+                : <><RefreshCw className="w-4 h-4" /> Sync from Excel</>
+              }
+            </button>
+          )}
+
+          {/* DATE SELECTOR */}
+          <div className="flex items-center gap-3 bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 shadow-inner">
+            <Calendar className="w-4 h-4 text-amber-500 shrink-0" />
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider font-mono">Date:</span>
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="bg-slate-950 border border-slate-850 px-3 py-1 rounded text-sm text-amber-500 font-mono font-bold focus:outline-none"
+            />
+          </div>
         </div>
       </div>
+
+      {/* SYNC SUCCESS BANNER */}
+      {syncResult && (
+        <div className="flex items-center gap-3 p-4 rounded-xl animate-slide-up"
+          style={{ background: 'linear-gradient(135deg,#dcfce7,#bbf7d0)', border: '1px solid rgba(22,163,74,0.3)' }}>
+          <CheckCircle2 className="w-5 h-5 shrink-0" style={{ color: '#16a34a' }} />
+          <div>
+            <p className="text-sm font-bold" style={{ color: '#14532d' }}>
+              Excel Synced Successfully — {syncResult.added} production entries loaded for {syncResult.date}
+            </p>
+            <p className="text-xs mt-0.5" style={{ color: '#166534' }}>
+              Items, shops, production batches and dispatch trips from 24MAY26-SWEETS.xlsx are now active. Date filter set to {syncResult.date}.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* SUCCESS ALERTS */}
       {saveSuccess && (

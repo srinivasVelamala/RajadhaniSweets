@@ -4,6 +4,7 @@ import cors from "cors";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from "dotenv";
+import { execFileSync } from "child_process";
 
 dotenv.config();
 
@@ -200,6 +201,19 @@ async function startServer() {
       highlightUnusualWastage: highlightUnusualWastage.slice(0, 2),
       profitInsights
     });
+  });
+
+  // ── Excel Sync endpoint: reads bundled 24MAY26-SWEETS.xlsx ─────────────────
+  app.get("/api/sync-excel", async (req, res) => {
+    try {
+      const scriptPath = path.join(process.cwd(), "parse-excel.cjs");
+      const stdout = execFileSync("node", [scriptPath], { maxBuffer: 10 * 1024 * 1024 }).toString();
+      const data = JSON.parse(stdout);
+      res.json(data);
+    } catch (err: any) {
+      console.error("Excel sync failed:", err.message);
+      res.status(500).json({ success: false, error: err.message });
+    }
   });
 
   // Vite development integration

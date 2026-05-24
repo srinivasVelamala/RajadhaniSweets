@@ -164,6 +164,54 @@ export default function App() {
     setDispatches([...importedDispatches, ...dispatches]);
   };
 
+  const handleSyncFromExcel = async (): Promise<{ added: number; date: string } | null> => {
+    try {
+      const res = await fetch('/api/sync-excel');
+      if (!res.ok) throw new Error('Server error');
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error || 'Sync failed');
+
+      // Merge items (by name)
+      setItems(prev => {
+        const merged = [...prev];
+        (data.items as SweetItem[]).forEach((ni: SweetItem) => {
+          if (!merged.some(i => i.name.toLowerCase() === ni.name.toLowerCase())) {
+            merged.push(ni);
+          }
+        });
+        return merged;
+      });
+
+      // Merge shops (by name)
+      setShops(prev => {
+        const merged = [...prev];
+        (data.shops as Shop[]).forEach((ns: Shop) => {
+          if (!merged.some(s => s.name.toLowerCase() === ns.name.toLowerCase())) {
+            merged.push(ns);
+          }
+        });
+        return merged;
+      });
+
+      // Replace production entries for that date, then add synced ones
+      setProduction(prev => {
+        const withoutDate = prev.filter(p => p.date !== data.date);
+        return [...(data.production as ProductionEntry[]), ...withoutDate];
+      });
+
+      // Merge dispatches for that date (skip if same trip+shop already exists)
+      setDispatches(prev => {
+        const withoutDate = prev.filter(d => d.date !== data.date);
+        return [...(data.dispatches as TripEntry[]), ...withoutDate];
+      });
+
+      return { added: data.counts.production, date: data.date };
+    } catch (err) {
+      console.error('Excel sync error:', err);
+      return null;
+    }
+  };
+
   return (
     <div className="min-h-screen font-sans flex antialiased" style={{ background: '#fdf6ee', position: 'relative', overflow: 'hidden' }}>
 
@@ -316,7 +364,7 @@ export default function App() {
             <Items items={items} onAddItem={handleAddItem} onUpdateItem={handleUpdateItem} userRole={userRole} />
           )}
           {activeTab === 'production' && (
-            <DailyProduction production={production} items={items} dispatches={dispatches} shops={shops} onAddProduction={handleAddProduction} onSaveBulkProduction={handleSaveBulkProduction} onAddDispatch={handleAddDispatch} onUpdateDispatch={handleUpdateDispatch} userRole={userRole} />
+            <DailyProduction production={production} items={items} dispatches={dispatches} shops={shops} onAddProduction={handleAddProduction} onSaveBulkProduction={handleSaveBulkProduction} onAddDispatch={handleAddDispatch} onUpdateDispatch={handleUpdateDispatch} onSyncFromExcel={handleSyncFromExcel} userRole={userRole} />
           )}
           {activeTab === 'dispatches' && (
             <Dispatches dispatches={dispatches} shops={shops} items={items} onAddDispatch={handleAddDispatch} onUpdateDispatch={handleUpdateDispatch} userRole={userRole} fastEntryMode={fastEntryMode} />
