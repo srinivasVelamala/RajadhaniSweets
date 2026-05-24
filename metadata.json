@@ -1,0 +1,6 @@
+{
+  "name": "Rajadhani",
+  "description": "Sweet Manufacturing & Supply Management System with daily production tracking, shop dispatch, inventory, expenses, worker wages, smart predictions and Excel/PDF reports.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

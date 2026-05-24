@@ -1,0 +1,100 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  /* Redefine Slate color coordinates to high-contrast Light/Ice-Blue and charcoal theme specs */
+  --color-white: #0f172a; /* Redefine white text variables for excellent dark contrast */
+  --color-slate-100: #0f172a; /* Title and heavy text */
+  --color-slate-200: #1e3a8a; /* Deep Royal/Navy Blue headings */
+  --color-slate-201: #1e40af; 
+  --color-slate-205: #1e3a8a;
+  --color-slate-300: #1e293b; /* Body and heavy info labels */
+  --color-slate-350: #192231;
+  --color-slate-400: #334155; /* Regular body description text */
+  --color-slate-450: #475569;
+  --color-slate-500: #475569; /* Soft labels */
+  --color-slate-550: #64748b;
+  --color-slate-600: #64748b;
+  --color-slate-650: #94a3b8;
+  --color-slate-700: #94a3b8; /* Outlines/grid lines */
+  --color-slate-800: #cbd5e1; /* Subtle divider borders */
+  --color-slate-850: #f1f5f9; /* Light panels highlight/form inputs background */
+  --color-slate-900: #ffffff; /* Squeaky clean pure white paper cards and sidebar */
+  --color-slate-950: #f8fafc; /* Beautiful soft Ice-Blue canvas background */
+
+  /* Map Amber coordinates to Brilliant Royal/Sky Blue accent highlights */
+  --color-amber-100: #dbeafe;
+  --color-amber-200: #93c5fd;
+  --color-amber-305: #60a5fa;
+  --color-amber-400: #3b82f6; /* Accent skies */
+  --color-amber-500: #2563eb; /* Classic Royal Blue triggers and buttons */
+  --color-amber-550: #1d4ed8;
+  --color-amber-600: #1d4ed8; /* Darker royal blue on button active triggers */
+}
+
+/* Base resets & custom typography scrollbars */
+html {
+  font-family: var(--font-sans);
+  background-color: var(--color-slate-950);
+}
+
+/* Webkit scrollbars styling for modern clean light panels */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-slate-950);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-slate-800);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-slate-700);
+}
+
+/* Micro-interaction animation utilities */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes pulseBorder {
+  0%, 100% { border-color: rgba(37, 99, 235, 0.2); }
+  50% { border-color: rgba(37, 99, 235, 0.5); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out forwards;
+}
+
+.animate-border-pulse {
+  animation: pulseBorder 2s infinite ease-in-out;
+}
+
+@media print {
+  .print\:hidden {
+    display: none !important;
+  }
+  .print\:p-0 {
+    padding: 0 !important;
+  }
+  .print\:m-0 {
+    margin: 0 !important;
+  }
+}
