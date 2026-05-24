@@ -284,25 +284,19 @@ export default function Dispatches({
                 className="w-full px-3 py-1.5 bg-slate-950 border border-slate-800 rounded text-sm text-slate-200 focus:outline-none focus:border-amber-500"
               >
                 <option value="">-- Select Retail Shop Outlet --</option>
-                {[...shops].filter(s => s.active).sort((a, b) => {
-                  const nameA = a.name.toLowerCase().trim();
-                  const nameB = b.name.toLowerCase().trim();
-                  const indexA = EXCEL_SHOP_ORDER.indexOf(nameA);
-                  const indexB = EXCEL_SHOP_ORDER.indexOf(nameB);
-
-                  const aInSeq = indexA >= 0;
-                  const bInSeq = indexB >= 0;
-
-                  if (aInSeq && !bInSeq) return -1;
-                  if (!aInSeq && bInSeq) return 1;
-                  if (aInSeq && bInSeq) return indexA - indexB;
-
-                  return a.name.localeCompare(b.name);
-                }).map(s => (
-                  <option key={s.id} value={s.id}>
-                    {s.name} (Active Discount: {s.discountPercentage}%)
-                  </option>
-                ))}
+                {[...shops]
+                  .filter(s => s.active && EXCEL_SHOP_ORDER.includes(s.name.toLowerCase().trim()))
+                  .sort((a, b) => {
+                    const nameA = a.name.toLowerCase().trim();
+                    const nameB = b.name.toLowerCase().trim();
+                    const indexA = EXCEL_SHOP_ORDER.indexOf(nameA);
+                    const indexB = EXCEL_SHOP_ORDER.indexOf(nameB);
+                    return indexA - indexB;
+                  }).map(s => (
+                    <option key={s.id} value={s.id}>
+                      {s.name} (Active Discount: {s.discountPercentage}%)
+                    </option>
+                  ))}
               </select>
             </div>
           </div>

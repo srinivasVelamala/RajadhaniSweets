@@ -345,12 +345,12 @@ export default function ExcelMigration({ onImportCompleted }: ExcelMigrationProp
   const loadMockExcelSheet = () => {
     setIsProcessing(true);
     setErrorMessage(null);
-    setFileName('Rajdhani_Sweet_Ledgers_2026.xlsx');
+    setFileName('Rajadhani_Sweet_Ledgers_2026.xlsx');
     setFileSize('125.4 KB');
 
     setTimeout(() => {
       const logs = [
-        `✔ Successfully loaded Mock Workspace Backup: "Rajdhani_Sweet_Ledgers_2026.xlsx"`,
+        `✔ Successfully loaded Mock Workspace Backup: "Rajadhani_Sweet_Ledgers_2026.xlsx"`,
         `✔ Sheet matches: "ShopMaster", "ItemMaster", "Daily Disbursement" folders verified.`,
         `🔍 Reading Sheet "ShopMaster" (2 rows)...`,
         `   ↳ Auto-Map matched to "ShopMaster" (Registered: 2 legacy outlets)`,
@@ -710,7 +710,7 @@ export default function ExcelMigration({ onImportCompleted }: ExcelMigrationProp
         <div className="flex flex-wrap gap-3 pt-1">
           <button 
             type="button" 
-            onClick={() => alert("Successfully simulated PDF Export report backup. Saved as reports/Rajdhani_Outstanding_Bal.pdf")}
+            onClick={() => alert("Successfully simulated PDF Export report backup. Saved as reports/Rajadhani_Outstanding_Bal.pdf")}
             className="flex items-center gap-2 px-4 py-2 bg-slate-950 hover:bg-slate-850 hover:text-amber-500 text-slate-300 border border-slate-800 rounded-lg text-xs font-mono font-semibold transition-colors"
           >
             <Download className="w-4 h-4 text-emerald-500" />
@@ -719,7 +719,7 @@ export default function ExcelMigration({ onImportCompleted }: ExcelMigrationProp
           
           <button 
             type="button" 
-            onClick={() => alert("Successfully simulated Excel Export register. Saved as backups/Rajdhani_Inventories_Backup.xlsx")}
+            onClick={() => alert("Successfully simulated Excel Export register. Saved as backups/Rajadhani_Inventories_Backup.xlsx")}
             className="flex items-center gap-2 px-4 py-2 bg-slate-950 hover:bg-slate-850 hover:text-amber-500 text-slate-300 border border-slate-800 rounded-lg text-xs font-mono font-semibold transition-colors"
           >
             <Download className="w-4 h-4 text-amber-500" />

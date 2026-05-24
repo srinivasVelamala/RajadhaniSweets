@@ -5226,190 +5226,190 @@ export const INITIAL_PRODUCTION: ProductionEntry[] = [
     "date": "2026-05-24",
     "sweetItemId": "W_EXCEL_392",
     "sweetItemName": "Paneer Kaaja",
-    "quantityPrepared": 4.252,
-    "batchNumber": "BT-EX-1001",
+    "quantityPrepared": 5.672,
+    "batchNumber": "BT-EX-1011",
     "notes": "Parsed from actual Excel dispatches for today",
-    "expectedSales": 1531
+    "expectedSales": 2042
   },
   {
     "id": "P_EXCEL_1",
     "date": "2026-05-24",
     "sweetItemId": "W_EXCEL_382",
     "sweetItemName": "orange cream",
-    "quantityPrepared": 1.554,
-    "batchNumber": "BT-EX-1002",
+    "quantityPrepared": 2.026,
+    "batchNumber": "BT-EX-1012",
     "notes": "Parsed from actual Excel dispatches for today",
-    "expectedSales": 559
+    "expectedSales": 729
   },
   {
     "id": "P_EXCEL_2",
     "date": "2026-05-24",
-    "sweetItemId": "W_EXCEL_487",
-    "sweetItemName": "White Angoor",
-    "quantityPrepared": 2.21,
-    "batchNumber": "BT-EX-1003",
+    "sweetItemId": "W_EXCEL_311",
+    "sweetItemName": "Junnu Sweet - Palakaya",
+    "quantityPrepared": 6.578,
+    "batchNumber": "BT-EX-1013",
     "notes": "Parsed from actual Excel dispatches for today",
-    "expectedSales": 707
+    "expectedSales": 1973
   },
   {
     "id": "P_EXCEL_3",
     "date": "2026-05-24",
-    "sweetItemId": "W_EXCEL_121",
-    "sweetItemName": "Cham Cham",
-    "quantityPrepared": 3.211,
-    "batchNumber": "BT-EX-1004",
+    "sweetItemId": "W_EXCEL_487",
+    "sweetItemName": "White Angoor",
+    "quantityPrepared": 3.708,
+    "batchNumber": "BT-EX-1014",
     "notes": "Parsed from actual Excel dispatches for today",
-    "expectedSales": 963
+    "expectedSales": 1187
   },
   {
     "id": "P_EXCEL_4",
     "date": "2026-05-24",
-    "sweetItemId": "W_EXCEL_476",
-    "sweetItemName": "Sweet bondi",
-    "quantityPrepared": 2.435,
-    "batchNumber": "BT-EX-1005",
+    "sweetItemId": "W_EXCEL_121",
+    "sweetItemName": "Cham Cham",
+    "quantityPrepared": 4.778,
+    "batchNumber": "BT-EX-1015",
     "notes": "Parsed from actual Excel dispatches for today",
-    "expectedSales": 633
+    "expectedSales": 1433
   },
   {
     "id": "P_EXCEL_5",
     "date": "2026-05-24",
-    "sweetItemId": "W_EXCEL_311",
-    "sweetItemName": "Junnu Sweet - Palakaya",
-    "quantityPrepared": 4.72,
-    "batchNumber": "BT-EX-1006",
+    "sweetItemId": "W_EXCEL_476",
+    "sweetItemName": "Sweet bondi",
+    "quantityPrepared": 3.34,
+    "batchNumber": "BT-EX-1016",
     "notes": "Parsed from actual Excel dispatches for today",
-    "expectedSales": 1416
+    "expectedSales": 868
   },
   {
     "id": "P_EXCEL_6",
     "date": "2026-05-24",
-    "sweetItemId": "W_EXCEL_314",
-    "sweetItemName": "Kalajam",
-    "quantityPrepared": 10.244,
-    "batchNumber": "BT-EX-1007",
-    "notes": "Parsed from actual Excel dispatches for today",
-    "expectedSales": 3073
-  },
-  {
-    "id": "P_EXCEL_7",
-    "date": "2026-05-24",
-    "sweetItemId": "W_EXCEL_428",
-    "sweetItemName": "Sandwich",
-    "quantityPrepared": 1.205,
-    "batchNumber": "BT-EX-1008",
-    "notes": "Parsed from actual Excel dispatches for today",
-    "expectedSales": 434
-  },
-  {
-    "id": "P_EXCEL_8",
-    "date": "2026-05-24",
-    "sweetItemId": "W_EXCEL_114",
-    "sweetItemName": "Cashew Kalakand",
-    "quantityPrepared": 3.459,
-    "batchNumber": "BT-EX-1009",
-    "notes": "Parsed from actual Excel dispatches for today",
-    "expectedSales": 1799
-  },
-  {
-    "id": "P_EXCEL_9",
-    "date": "2026-05-24",
     "sweetItemId": "W_EXCEL_154",
     "sweetItemName": "Coconut Bun",
     "quantityPrepared": 15,
-    "batchNumber": "BT-EX-1010",
+    "batchNumber": "BT-EX-1017",
     "notes": "Parsed from actual Excel dispatches for today",
     "expectedSales": 900
   },
   {
-    "id": "P_EXCEL_10",
+    "id": "P_EXCEL_7",
     "date": "2026-05-24",
     "sweetItemId": "W_EXCEL_1",
     "sweetItemName": "4 Piece Bun",
     "quantityPrepared": 24,
-    "batchNumber": "BT-EX-1011",
+    "batchNumber": "BT-EX-1018",
     "notes": "Parsed from actual Excel dispatches for today",
     "expectedSales": 480
   },
   {
-    "id": "P_EXCEL_11",
+    "id": "P_EXCEL_8",
     "date": "2026-05-24",
     "sweetItemId": "W_EXCEL_425",
     "sweetItemName": "Round Cake Packet 6pc packet",
     "quantityPrepared": 9,
-    "batchNumber": "BT-EX-1012",
+    "batchNumber": "BT-EX-1019",
     "notes": "Parsed from actual Excel dispatches for today",
     "expectedSales": 450
   },
   {
-    "id": "P_EXCEL_12",
+    "id": "P_EXCEL_9",
     "date": "2026-05-24",
     "sweetItemId": "W_EXCEL_153",
     "sweetItemName": "Coconut Biscuit Pack",
     "quantityPrepared": 4,
-    "batchNumber": "BT-EX-1013",
+    "batchNumber": "BT-EX-1020",
     "notes": "Parsed from actual Excel dispatches for today",
     "expectedSales": 280
   },
   {
-    "id": "P_EXCEL_13",
+    "id": "P_EXCEL_10",
     "date": "2026-05-24",
     "sweetItemId": "W_EXCEL_29",
     "sweetItemName": "Banglore Bun",
     "quantityPrepared": 15,
-    "batchNumber": "BT-EX-1014",
+    "batchNumber": "BT-EX-1021",
     "notes": "Parsed from actual Excel dispatches for today",
     "expectedSales": 300
   },
   {
-    "id": "P_EXCEL_14",
+    "id": "P_EXCEL_11",
     "date": "2026-05-24",
     "sweetItemId": "W_EXCEL_276",
     "sweetItemName": "Fruit Bun",
     "quantityPrepared": 46,
-    "batchNumber": "BT-EX-1015",
+    "batchNumber": "BT-EX-1022",
     "notes": "Parsed from actual Excel dispatches for today",
     "expectedSales": 920
   },
   {
-    "id": "P_EXCEL_15",
+    "id": "P_EXCEL_12",
     "date": "2026-05-24",
     "sweetItemId": "W_EXCEL_253",
     "sweetItemName": "Dil Pasand",
     "quantityPrepared": 14,
-    "batchNumber": "BT-EX-1016",
+    "batchNumber": "BT-EX-1023",
     "notes": "Parsed from actual Excel dispatches for today",
     "expectedSales": 560
   },
   {
-    "id": "P_EXCEL_16",
+    "id": "P_EXCEL_13",
     "date": "2026-05-24",
     "sweetItemId": "W_EXCEL_336",
     "sweetItemName": "Large Bread",
     "quantityPrepared": 13,
-    "batchNumber": "BT-EX-1017",
+    "batchNumber": "BT-EX-1024",
     "notes": "Parsed from actual Excel dispatches for today",
     "expectedSales": 780
   },
   {
-    "id": "P_EXCEL_17",
+    "id": "P_EXCEL_14",
     "date": "2026-05-24",
     "sweetItemId": "W_EXCEL_453",
     "sweetItemName": "Spong cake 50/-",
     "quantityPrepared": 6,
-    "batchNumber": "BT-EX-1018",
+    "batchNumber": "BT-EX-1025",
     "notes": "Parsed from actual Excel dispatches for today",
     "expectedSales": 300
   },
   {
-    "id": "P_EXCEL_18",
+    "id": "P_EXCEL_15",
     "date": "2026-05-24",
     "sweetItemId": "W_EXCEL_454",
     "sweetItemName": "Spong cake 80/-",
     "quantityPrepared": 2,
-    "batchNumber": "BT-EX-1019",
+    "batchNumber": "BT-EX-1026",
     "notes": "Parsed from actual Excel dispatches for today",
     "expectedSales": 160
+  },
+  {
+    "id": "P_EXCEL_16",
+    "date": "2026-05-24",
+    "sweetItemId": "W_EXCEL_314",
+    "sweetItemName": "Kalajam",
+    "quantityPrepared": 11.792,
+    "batchNumber": "BT-EX-1027",
+    "notes": "Parsed from actual Excel dispatches for today",
+    "expectedSales": 3538
+  },
+  {
+    "id": "P_EXCEL_17",
+    "date": "2026-05-24",
+    "sweetItemId": "W_EXCEL_428",
+    "sweetItemName": "Sandwich",
+    "quantityPrepared": 1.774,
+    "batchNumber": "BT-EX-1028",
+    "notes": "Parsed from actual Excel dispatches for today",
+    "expectedSales": 639
+  },
+  {
+    "id": "P_EXCEL_18",
+    "date": "2026-05-24",
+    "sweetItemId": "W_EXCEL_114",
+    "sweetItemName": "Cashew Kalakand",
+    "quantityPrepared": 4.746,
+    "batchNumber": "BT-EX-1029",
+    "notes": "Parsed from actual Excel dispatches for today",
+    "expectedSales": 2468
   },
   {
     "id": "P_EXCEL_19",
@@ -5417,7 +5417,7 @@ export const INITIAL_PRODUCTION: ProductionEntry[] = [
     "sweetItemId": "W_EXCEL_486",
     "sweetItemName": "Veg Puff",
     "quantityPrepared": 58,
-    "batchNumber": "BT-EX-1020",
+    "batchNumber": "BT-EX-1030",
     "notes": "Parsed from actual Excel dispatches for today",
     "expectedSales": 1160
   },
@@ -5427,7 +5427,7 @@ export const INITIAL_PRODUCTION: ProductionEntry[] = [
     "sweetItemId": "W_EXCEL_272",
     "sweetItemName": "Egg Puff",
     "quantityPrepared": 76,
-    "batchNumber": "BT-EX-1021",
+    "batchNumber": "BT-EX-1031",
     "notes": "Parsed from actual Excel dispatches for today",
     "expectedSales": 1900
   },
@@ -5437,7 +5437,7 @@ export const INITIAL_PRODUCTION: ProductionEntry[] = [
     "sweetItemId": "W_EXCEL_395",
     "sweetItemName": "panner puff",
     "quantityPrepared": 15,
-    "batchNumber": "BT-EX-1022",
+    "batchNumber": "BT-EX-1032",
     "notes": "Parsed from actual Excel dispatches for today",
     "expectedSales": 450
   },
@@ -5447,69 +5447,69 @@ export const INITIAL_PRODUCTION: ProductionEntry[] = [
     "sweetItemId": "W_EXCEL_427",
     "sweetItemName": "Samosa",
     "quantityPrepared": 45,
-    "batchNumber": "BT-EX-1023",
+    "batchNumber": "BT-EX-1033",
     "notes": "Parsed from actual Excel dispatches for today",
     "expectedSales": 675
   },
   {
     "id": "P_EXCEL_23",
     "date": "2026-05-24",
-    "sweetItemId": "W_EXCEL_74",
-    "sweetItemName": "Butter Cream Cake 1/2 kg cake",
-    "quantityPrepared": 3,
-    "batchNumber": "BT-EX-1024",
+    "sweetItemId": "W_EXCEL_130",
+    "sweetItemName": "chicken puff",
+    "quantityPrepared": 5,
+    "batchNumber": "BT-EX-1034",
     "notes": "Parsed from actual Excel dispatches for today",
-    "expectedSales": 540
+    "expectedSales": 200
   },
   {
     "id": "P_EXCEL_24",
     "date": "2026-05-24",
-    "sweetItemId": "W_EXCEL_130",
-    "sweetItemName": "chicken puff",
-    "quantityPrepared": 5,
-    "batchNumber": "BT-EX-1025",
+    "sweetItemId": "W_EXCEL_72",
+    "sweetItemName": "Butter Cream B. forest Cake 1/2 kg",
+    "quantityPrepared": 1,
+    "batchNumber": "BT-EX-1035",
     "notes": "Parsed from actual Excel dispatches for today",
     "expectedSales": 200
   },
   {
     "id": "P_EXCEL_25",
     "date": "2026-05-24",
-    "sweetItemId": "W_EXCEL_72",
-    "sweetItemName": "Butter Cream B. forest Cake 1/2 kg",
-    "quantityPrepared": 1,
-    "batchNumber": "BT-EX-1026",
+    "sweetItemId": "W_EXCEL_74",
+    "sweetItemName": "Butter Cream Cake 1/2 kg cake",
+    "quantityPrepared": 3,
+    "batchNumber": "BT-EX-1036",
     "notes": "Parsed from actual Excel dispatches for today",
-    "expectedSales": 200
+    "expectedSales": 540
   },
   {
     "id": "P_EXCEL_26",
     "date": "2026-05-24",
-    "sweetItemId": "W_EXCEL_240",
-    "sweetItemName": "Cream Bun",
-    "quantityPrepared": 10,
-    "batchNumber": "BT-EX-1027",
-    "notes": "Parsed from actual Excel dispatches for today",
-    "expectedSales": 150
-  },
-  {
-    "id": "P_EXCEL_27",
-    "date": "2026-05-24",
     "sweetItemId": "W_EXCEL_356",
     "sweetItemName": "Medium Bread",
     "quantityPrepared": 13,
-    "batchNumber": "BT-EX-1028",
+    "batchNumber": "BT-EX-1037",
     "notes": "Parsed from actual Excel dispatches for today",
     "expectedSales": 520
   },
   {
-    "id": "P_EXCEL_28",
+    "id": "P_EXCEL_27",
     "date": "2026-05-24",
     "sweetItemId": "W_EXCEL_475",
     "sweetItemName": "Super Biscuit Pack",
     "quantityPrepared": 5,
-    "batchNumber": "BT-EX-1029",
+    "batchNumber": "BT-EX-1038",
     "notes": "Parsed from actual Excel dispatches for today",
     "expectedSales": 350
+  },
+  {
+    "id": "P_EXCEL_28",
+    "date": "2026-05-24",
+    "sweetItemId": "W_EXCEL_240",
+    "sweetItemName": "Cream Bun",
+    "quantityPrepared": 10,
+    "batchNumber": "BT-EX-1039",
+    "notes": "Parsed from actual Excel dispatches for today",
+    "expectedSales": 150
   },
   {
     "id": "P_EXCEL_29",
@@ -5517,7 +5517,7 @@ export const INITIAL_PRODUCTION: ProductionEntry[] = [
     "sweetItemId": "W_EXCEL_434",
     "sweetItemName": "Small Bread",
     "quantityPrepared": 3,
-    "batchNumber": "BT-EX-1030",
+    "batchNumber": "BT-EX-1040",
     "notes": "Parsed from actual Excel dispatches for today",
     "expectedSales": 60
   },
@@ -5526,10 +5526,10 @@ export const INITIAL_PRODUCTION: ProductionEntry[] = [
     "date": "2026-05-24",
     "sweetItemId": "W_EXCEL_385",
     "sweetItemName": "pakam (net price)",
-    "quantityPrepared": 5.802,
-    "batchNumber": "BT-EX-1031",
+    "quantityPrepared": 5.882,
+    "batchNumber": "BT-EX-1041",
     "notes": "Parsed from actual Excel dispatches for today",
-    "expectedSales": 290
+    "expectedSales": 294
   },
   {
     "id": "P_EXCEL_31",
@@ -5537,7 +5537,7 @@ export const INITIAL_PRODUCTION: ProductionEntry[] = [
     "sweetItemId": "W_EXCEL_21",
     "sweetItemName": "Badam Milk (Net Price)",
     "quantityPrepared": 135,
-    "batchNumber": "BT-EX-1032",
+    "batchNumber": "BT-EX-1042",
     "notes": "Parsed from actual Excel dispatches for today",
     "expectedSales": 3240
   },
@@ -5546,110 +5546,110 @@ export const INITIAL_PRODUCTION: ProductionEntry[] = [
     "date": "2026-05-24",
     "sweetItemId": "W_EXCEL_331",
     "sweetItemName": "Kova Kajjikaya",
-    "quantityPrepared": 3.377,
-    "batchNumber": "BT-EX-1033",
+    "quantityPrepared": 4.436,
+    "batchNumber": "BT-EX-1043",
     "notes": "Parsed from actual Excel dispatches for today",
-    "expectedSales": 1891
+    "expectedSales": 2484
   },
   {
     "id": "P_EXCEL_33",
     "date": "2026-05-24",
-    "sweetItemId": "W_EXCEL_326",
-    "sweetItemName": "Kova Billa small",
-    "quantityPrepared": 11.295,
-    "batchNumber": "BT-EX-1034",
+    "sweetItemId": "W_EXCEL_344",
+    "sweetItemName": "Malai Chop",
+    "quantityPrepared": 1.898,
+    "batchNumber": "BT-EX-1044",
     "notes": "Parsed from actual Excel dispatches for today",
-    "expectedSales": 5873
+    "expectedSales": 721
   },
   {
     "id": "P_EXCEL_34",
     "date": "2026-05-24",
-    "sweetItemId": "W_EXCEL_334",
-    "sweetItemName": "Laddu",
-    "quantityPrepared": 2.499,
-    "batchNumber": "BT-EX-1035",
+    "sweetItemId": "W_EXCEL_326",
+    "sweetItemName": "Kova Billa small",
+    "quantityPrepared": 14.35,
+    "batchNumber": "BT-EX-1045",
     "notes": "Parsed from actual Excel dispatches for today",
-    "expectedSales": 650
+    "expectedSales": 7462
   },
   {
     "id": "P_EXCEL_35",
     "date": "2026-05-24",
-    "sweetItemId": "W_EXCEL_109",
-    "sweetItemName": "cashew halwa",
-    "quantityPrepared": 0.695,
-    "batchNumber": "BT-EX-1036",
+    "sweetItemId": "W_EXCEL_334",
+    "sweetItemName": "Laddu",
+    "quantityPrepared": 3.222,
+    "batchNumber": "BT-EX-1046",
     "notes": "Parsed from actual Excel dispatches for today",
-    "expectedSales": 320
+    "expectedSales": 838
   },
   {
     "id": "P_EXCEL_36",
     "date": "2026-05-24",
-    "sweetItemId": "W_EXCEL_474",
-    "sweetItemName": "Sunnundalu",
-    "quantityPrepared": 3.824,
-    "batchNumber": "BT-EX-1037",
+    "sweetItemId": "W_EXCEL_350",
+    "sweetItemName": "Malaipuri",
+    "quantityPrepared": 1.548,
+    "batchNumber": "BT-EX-1047",
     "notes": "Parsed from actual Excel dispatches for today",
-    "expectedSales": 1453
+    "expectedSales": 805
   },
   {
     "id": "P_EXCEL_37",
     "date": "2026-05-24",
-    "sweetItemId": "W_EXCEL_361",
-    "sweetItemName": "Mixture",
-    "quantityPrepared": 3.719,
-    "batchNumber": "BT-EX-1038",
+    "sweetItemId": "W_EXCEL_362",
+    "sweetItemName": "Moti Choor Laddu",
+    "quantityPrepared": 6.27,
+    "batchNumber": "BT-EX-1048",
     "notes": "Parsed from actual Excel dispatches for today",
-    "expectedSales": 1116
+    "expectedSales": 1630
   },
   {
     "id": "P_EXCEL_38",
     "date": "2026-05-24",
-    "sweetItemId": "W_EXCEL_344",
-    "sweetItemName": "Malai Chop",
-    "quantityPrepared": 1.207,
-    "batchNumber": "BT-EX-1039",
+    "sweetItemId": "W_EXCEL_309",
+    "sweetItemName": "Junnu (NET PRICE)",
+    "quantityPrepared": 3.346,
+    "batchNumber": "BT-EX-1049",
     "notes": "Parsed from actual Excel dispatches for today",
-    "expectedSales": 459
+    "expectedSales": 770
   },
   {
     "id": "P_EXCEL_39",
     "date": "2026-05-24",
-    "sweetItemId": "W_EXCEL_350",
-    "sweetItemName": "Malaipuri",
-    "quantityPrepared": 1.009,
-    "batchNumber": "BT-EX-1040",
+    "sweetItemId": "W_EXCEL_109",
+    "sweetItemName": "cashew halwa",
+    "quantityPrepared": 1.144,
+    "batchNumber": "BT-EX-1050",
     "notes": "Parsed from actual Excel dispatches for today",
-    "expectedSales": 525
+    "expectedSales": 526
   },
   {
     "id": "P_EXCEL_40",
     "date": "2026-05-24",
-    "sweetItemId": "W_EXCEL_362",
-    "sweetItemName": "Moti Choor Laddu",
-    "quantityPrepared": 4.866,
-    "batchNumber": "BT-EX-1041",
+    "sweetItemId": "W_EXCEL_474",
+    "sweetItemName": "Sunnundalu",
+    "quantityPrepared": 4.43,
+    "batchNumber": "BT-EX-1051",
     "notes": "Parsed from actual Excel dispatches for today",
-    "expectedSales": 1265
+    "expectedSales": 1683
   },
   {
     "id": "P_EXCEL_41",
     "date": "2026-05-24",
-    "sweetItemId": "W_EXCEL_309",
-    "sweetItemName": "Junnu (NET PRICE)",
-    "quantityPrepared": 2.621,
-    "batchNumber": "BT-EX-1042",
+    "sweetItemId": "W_EXCEL_249",
+    "sweetItemName": "Cutlet",
+    "quantityPrepared": 2.306,
+    "batchNumber": "BT-EX-1052",
     "notes": "Parsed from actual Excel dispatches for today",
-    "expectedSales": 603
+    "expectedSales": 692
   },
   {
     "id": "P_EXCEL_42",
     "date": "2026-05-24",
-    "sweetItemId": "W_EXCEL_249",
-    "sweetItemName": "Cutlet",
-    "quantityPrepared": 1.645,
-    "batchNumber": "BT-EX-1043",
+    "sweetItemId": "W_EXCEL_361",
+    "sweetItemName": "Mixture",
+    "quantityPrepared": 3.834,
+    "batchNumber": "BT-EX-1053",
     "notes": "Parsed from actual Excel dispatches for today",
-    "expectedSales": 494
+    "expectedSales": 1150
   },
   {
     "id": "P_EXCEL_43",
@@ -5657,7 +5657,7 @@ export const INITIAL_PRODUCTION: ProductionEntry[] = [
     "sweetItemId": "W_EXCEL_420",
     "sweetItemName": "Rasmalai (1pc box)",
     "quantityPrepared": 15,
-    "batchNumber": "BT-EX-1044",
+    "batchNumber": "BT-EX-1054",
     "notes": "Parsed from actual Excel dispatches for today",
     "expectedSales": 525
   },
@@ -5667,7 +5667,7 @@ export const INITIAL_PRODUCTION: ProductionEntry[] = [
     "sweetItemId": "W_EXCEL_183",
     "sweetItemName": "Cool Cake  B Scotch   1/2 Kg",
     "quantityPrepared": 1,
-    "batchNumber": "BT-EX-1045",
+    "batchNumber": "BT-EX-1055",
     "notes": "Parsed from actual Excel dispatches for today",
     "expectedSales": 350
   },
@@ -5677,7 +5677,7 @@ export const INITIAL_PRODUCTION: ProductionEntry[] = [
     "sweetItemId": "W_EXCEL_186",
     "sweetItemName": "Cool Cake  B Scotch   Pc",
     "quantityPrepared": 12,
-    "batchNumber": "BT-EX-1046",
+    "batchNumber": "BT-EX-1056",
     "notes": "Parsed from actual Excel dispatches for today",
     "expectedSales": 780
   },
@@ -5687,7 +5687,7 @@ export const INITIAL_PRODUCTION: ProductionEntry[] = [
     "sweetItemId": "W_EXCEL_195",
     "sweetItemName": "Cool Cake  Chocotale   Pc",
     "quantityPrepared": 6,
-    "batchNumber": "BT-EX-1047",
+    "batchNumber": "BT-EX-1057",
     "notes": "Parsed from actual Excel dispatches for today",
     "expectedSales": 450
   },
@@ -5697,7 +5697,7 @@ export const INITIAL_PRODUCTION: ProductionEntry[] = [
     "sweetItemId": "W_EXCEL_238",
     "sweetItemName": "Cool Cake vanilla Pc",
     "quantityPrepared": 12,
-    "batchNumber": "BT-EX-1048",
+    "batchNumber": "BT-EX-1058",
     "notes": "Parsed from actual Excel dispatches for today",
     "expectedSales": 600
   },
@@ -5707,7 +5707,7 @@ export const INITIAL_PRODUCTION: ProductionEntry[] = [
     "sweetItemId": "W_EXCEL_256",
     "sweetItemName": "Donut",
     "quantityPrepared": 31,
-    "batchNumber": "BT-EX-1049",
+    "batchNumber": "BT-EX-1059",
     "notes": "Parsed from actual Excel dispatches for today",
     "expectedSales": 775
   },
@@ -5717,7 +5717,7 @@ export const INITIAL_PRODUCTION: ProductionEntry[] = [
     "sweetItemId": "W_EXCEL_462",
     "sweetItemName": "Square Cake Packet",
     "quantityPrepared": 6,
-    "batchNumber": "BT-EX-1050",
+    "batchNumber": "BT-EX-1060",
     "notes": "Parsed from actual Excel dispatches for today",
     "expectedSales": 300
   },
@@ -5727,7 +5727,7 @@ export const INITIAL_PRODUCTION: ProductionEntry[] = [
     "sweetItemId": "W_EXCEL_283",
     "sweetItemName": "ghee cake box (200g)",
     "quantityPrepared": 5,
-    "batchNumber": "BT-EX-1051",
+    "batchNumber": "BT-EX-1061",
     "notes": "Parsed from actual Excel dispatches for today",
     "expectedSales": 350
   },
@@ -5737,7 +5737,7 @@ export const INITIAL_PRODUCTION: ProductionEntry[] = [
     "sweetItemId": "W_EXCEL_273",
     "sweetItemName": "fruit  Slice cake box",
     "quantityPrepared": 5,
-    "batchNumber": "BT-EX-1052",
+    "batchNumber": "BT-EX-1062",
     "notes": "Parsed from actual Excel dispatches for today",
     "expectedSales": 400
   }
@@ -5757,10 +5757,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "grossWeight": 3.136,
         "trayWeight": 0.688,
         "wastage": 3,
-        "netWeight": 2.3746,
+        "netWeight": 2.3745600000000007,
         "rate": 360,
         "discountPercentage": 25,
-        "amount": 641
+        "amount": 213.71040000000005
       },
       {
         "sweetItemId": "W_EXCEL_382",
@@ -5768,10 +5768,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "grossWeight": 2.026,
         "trayWeight": 0.424,
         "wastage": 3,
-        "netWeight": 1.5539,
+        "netWeight": 1.5539399999999999,
         "rate": 360,
         "discountPercentage": 25,
-        "amount": 420
+        "amount": 139.85459999999998
       },
       {
         "sweetItemId": "W_EXCEL_487",
@@ -5779,10 +5779,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "grossWeight": 2.026,
         "trayWeight": 0.74,
         "wastage": 3,
-        "netWeight": 1.2474,
+        "netWeight": 1.2474199999999998,
         "rate": 320,
         "discountPercentage": 25,
-        "amount": 299
+        "amount": 99.79359999999998
       },
       {
         "sweetItemId": "W_EXCEL_121",
@@ -5790,10 +5790,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "grossWeight": 2.568,
         "trayWeight": 0.728,
         "wastage": 3,
-        "netWeight": 1.7848,
+        "netWeight": 1.7848000000000002,
         "rate": 300,
         "discountPercentage": 25,
-        "amount": 402
+        "amount": 133.86
       },
       {
         "sweetItemId": "W_EXCEL_476",
@@ -5804,10 +5804,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 2.4347,
         "rate": 260,
         "discountPercentage": 25,
-        "amount": 475
+        "amount": 158.25549999999998
       }
     ],
-    "totalAmount": 2237,
+    "totalAmount": 745,
     "status": "Completed"
   },
   {
@@ -5823,10 +5823,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "grossWeight": 3.33,
         "trayWeight": 0.792,
         "wastage": 3,
-        "netWeight": 2.4619,
+        "netWeight": 2.46186,
         "rate": 300,
         "discountPercentage": 23,
-        "amount": 569
+        "amount": 169.86834
       },
       {
         "sweetItemId": "W_EXCEL_121",
@@ -5837,7 +5837,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 1.4259,
         "rate": 300,
         "discountPercentage": 23,
-        "amount": 329
+        "amount": 98.38709999999999
       },
       {
         "sweetItemId": "W_EXCEL_314",
@@ -5845,10 +5845,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "grossWeight": 3.276,
         "trayWeight": 0.738,
         "wastage": 3,
-        "netWeight": 2.4619,
+        "netWeight": 2.4618599999999997,
         "rate": 300,
         "discountPercentage": 23,
-        "amount": 569
+        "amount": 169.86834
       },
       {
         "sweetItemId": "W_EXCEL_487",
@@ -5856,10 +5856,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "grossWeight": 1.682,
         "trayWeight": 0.69,
         "wastage": 3,
-        "netWeight": 0.9622,
+        "netWeight": 0.96224,
         "rate": 320,
         "discountPercentage": 23,
-        "amount": 237
+        "amount": 70.82086399999999
       },
       {
         "sweetItemId": "W_EXCEL_392",
@@ -5867,10 +5867,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "grossWeight": 2.536,
         "trayWeight": 0.6,
         "wastage": 3,
-        "netWeight": 1.8779,
+        "netWeight": 1.87792,
         "rate": 360,
         "discountPercentage": 23,
-        "amount": 521
+        "amount": 155.491776
       },
       {
         "sweetItemId": "W_EXCEL_428",
@@ -5878,10 +5878,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "grossWeight": 1.774,
         "trayWeight": 0.532,
         "wastage": 3,
-        "netWeight": 1.2047,
+        "netWeight": 1.2047400000000001,
         "rate": 360,
         "discountPercentage": 23,
-        "amount": 334
+        "amount": 99.75247200000001
       },
       {
         "sweetItemId": "W_EXCEL_114",
@@ -5889,13 +5889,13 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "grossWeight": 2.102,
         "trayWeight": 0.548,
         "wastage": 3,
-        "netWeight": 1.5074,
+        "netWeight": 1.5073799999999997,
         "rate": 520,
         "discountPercentage": 23,
-        "amount": 604
+        "amount": 180.28264799999997
       }
     ],
-    "totalAmount": 3163,
+    "totalAmount": 944,
     "status": "Completed"
   },
   {
@@ -5908,16 +5908,16 @@ export const INITIAL_TRIPS: TripEntry[] = [
       {
         "sweetItemId": "W_EXCEL_311",
         "sweetItemName": "Junnu Sweet - Palakaya",
-        "grossWeight": 3.068,
-        "trayWeight": 0.81,
+        "grossWeight": 3.248,
+        "trayWeight": 0.18,
         "wastage": 0,
-        "netWeight": 2.258,
+        "netWeight": 3.068,
         "rate": 300,
         "discountPercentage": 20,
-        "amount": 542
+        "amount": 736.32
       }
     ],
-    "totalAmount": 542,
+    "totalAmount": 736,
     "status": "Completed"
   },
   {
@@ -5936,7 +5936,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 2,
         "rate": 60,
         "discountPercentage": 25,
-        "amount": 90
+        "amount": 30
       },
       {
         "sweetItemId": "W_EXCEL_1",
@@ -5947,7 +5947,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 8,
         "rate": 20,
         "discountPercentage": 25,
-        "amount": 120
+        "amount": 40
       },
       {
         "sweetItemId": "W_EXCEL_425",
@@ -5958,7 +5958,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 3,
         "rate": 50,
         "discountPercentage": 25,
-        "amount": 113
+        "amount": 37.5
       },
       {
         "sweetItemId": "W_EXCEL_153",
@@ -5969,10 +5969,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 4,
         "rate": 70,
         "discountPercentage": 25,
-        "amount": 210
+        "amount": 70
       }
     ],
-    "totalAmount": 533,
+    "totalAmount": 178,
     "status": "Completed"
   },
   {
@@ -5991,7 +5991,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 8,
         "rate": 60,
         "discountPercentage": 20,
-        "amount": 384
+        "amount": 96
       },
       {
         "sweetItemId": "W_EXCEL_29",
@@ -6002,7 +6002,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 10,
         "rate": 20,
         "discountPercentage": 20,
-        "amount": 160
+        "amount": 40
       },
       {
         "sweetItemId": "W_EXCEL_276",
@@ -6013,7 +6013,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 10,
         "rate": 20,
         "discountPercentage": 20,
-        "amount": 160
+        "amount": 40
       },
       {
         "sweetItemId": "W_EXCEL_253",
@@ -6024,7 +6024,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 6,
         "rate": 40,
         "discountPercentage": 20,
-        "amount": 192
+        "amount": 48
       },
       {
         "sweetItemId": "W_EXCEL_425",
@@ -6035,7 +6035,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 6,
         "rate": 50,
         "discountPercentage": 20,
-        "amount": 240
+        "amount": 60
       },
       {
         "sweetItemId": "W_EXCEL_336",
@@ -6046,7 +6046,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 6,
         "rate": 60,
         "discountPercentage": 20,
-        "amount": 288
+        "amount": 72
       },
       {
         "sweetItemId": "W_EXCEL_453",
@@ -6057,7 +6057,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 6,
         "rate": 50,
         "discountPercentage": 20,
-        "amount": 240
+        "amount": 60
       },
       {
         "sweetItemId": "W_EXCEL_454",
@@ -6068,10 +6068,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 2,
         "rate": 80,
         "discountPercentage": 20,
-        "amount": 128
+        "amount": 32
       }
     ],
-    "totalAmount": 1792,
+    "totalAmount": 448,
     "status": "Completed"
   },
   {
@@ -6087,13 +6087,13 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "grossWeight": 2.644,
         "trayWeight": 0.632,
         "wastage": 3,
-        "netWeight": 1.9516,
+        "netWeight": 1.9516399999999998,
         "rate": 520,
         "discountPercentage": 25,
-        "amount": 761
+        "amount": 253.71319999999997
       }
     ],
-    "totalAmount": 761,
+    "totalAmount": 254,
     "status": "Completed"
   },
   {
@@ -6112,7 +6112,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 10,
         "rate": 20,
         "discountPercentage": 20,
-        "amount": 160
+        "amount": 40
       },
       {
         "sweetItemId": "W_EXCEL_272",
@@ -6123,10 +6123,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 20,
         "rate": 25,
         "discountPercentage": 20,
-        "amount": 400
+        "amount": 100
       }
     ],
-    "totalAmount": 560,
+    "totalAmount": 140,
     "status": "Completed"
   },
   {
@@ -6145,7 +6145,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 8,
         "rate": 20,
         "discountPercentage": 20,
-        "amount": 128
+        "amount": 32
       },
       {
         "sweetItemId": "W_EXCEL_272",
@@ -6156,7 +6156,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 6,
         "rate": 25,
         "discountPercentage": 20,
-        "amount": 120
+        "amount": 30
       },
       {
         "sweetItemId": "W_EXCEL_395",
@@ -6167,10 +6167,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 3,
         "rate": 30,
         "discountPercentage": 20,
-        "amount": 72
+        "amount": 18
       }
     ],
-    "totalAmount": 320,
+    "totalAmount": 80,
     "status": "Completed"
   },
   {
@@ -6189,7 +6189,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 5,
         "rate": 20,
         "discountPercentage": 25,
-        "amount": 75
+        "amount": 25
       },
       {
         "sweetItemId": "W_EXCEL_272",
@@ -6200,7 +6200,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 5,
         "rate": 25,
         "discountPercentage": 25,
-        "amount": 94
+        "amount": 31.25
       },
       {
         "sweetItemId": "W_EXCEL_395",
@@ -6211,7 +6211,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 2,
         "rate": 30,
         "discountPercentage": 25,
-        "amount": 45
+        "amount": 15
       },
       {
         "sweetItemId": "W_EXCEL_427",
@@ -6222,7 +6222,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 25,
         "rate": 15,
         "discountPercentage": 25,
-        "amount": 281
+        "amount": 93.75
       },
       {
         "sweetItemId": "W_EXCEL_74",
@@ -6233,10 +6233,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 2,
         "rate": 180,
         "discountPercentage": 25,
-        "amount": 270
+        "amount": 90
       }
     ],
-    "totalAmount": 765,
+    "totalAmount": 255,
     "status": "Completed"
   },
   {
@@ -6255,7 +6255,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 5,
         "rate": 20,
         "discountPercentage": 23,
-        "amount": 77
+        "amount": 23
       },
       {
         "sweetItemId": "W_EXCEL_272",
@@ -6266,7 +6266,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 10,
         "rate": 25,
         "discountPercentage": 23,
-        "amount": 193
+        "amount": 57.5
       },
       {
         "sweetItemId": "W_EXCEL_395",
@@ -6277,7 +6277,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 5,
         "rate": 30,
         "discountPercentage": 23,
-        "amount": 116
+        "amount": 34.5
       },
       {
         "sweetItemId": "W_EXCEL_130",
@@ -6288,7 +6288,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 5,
         "rate": 40,
         "discountPercentage": 23,
-        "amount": 154
+        "amount": 46
       },
       {
         "sweetItemId": "W_EXCEL_427",
@@ -6299,7 +6299,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 10,
         "rate": 15,
         "discountPercentage": 23,
-        "amount": 116
+        "amount": 34.5
       },
       {
         "sweetItemId": "W_EXCEL_336",
@@ -6310,7 +6310,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 4,
         "rate": 60,
         "discountPercentage": 23,
-        "amount": 185
+        "amount": 55.2
       },
       {
         "sweetItemId": "W_EXCEL_154",
@@ -6321,7 +6321,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 3,
         "rate": 60,
         "discountPercentage": 23,
-        "amount": 139
+        "amount": 41.4
       },
       {
         "sweetItemId": "W_EXCEL_253",
@@ -6332,7 +6332,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 3,
         "rate": 40,
         "discountPercentage": 23,
-        "amount": 92
+        "amount": 27.6
       },
       {
         "sweetItemId": "W_EXCEL_276",
@@ -6343,7 +6343,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 6,
         "rate": 20,
         "discountPercentage": 23,
-        "amount": 92
+        "amount": 27.6
       },
       {
         "sweetItemId": "W_EXCEL_1",
@@ -6354,10 +6354,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 6,
         "rate": 20,
         "discountPercentage": 23,
-        "amount": 92
+        "amount": 27.6
       }
     ],
-    "totalAmount": 1256,
+    "totalAmount": 375,
     "status": "Completed"
   },
   {
@@ -6376,7 +6376,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 10,
         "rate": 20,
         "discountPercentage": 20,
-        "amount": 160
+        "amount": 40
       },
       {
         "sweetItemId": "W_EXCEL_272",
@@ -6387,7 +6387,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 20,
         "rate": 25,
         "discountPercentage": 20,
-        "amount": 400
+        "amount": 100
       },
       {
         "sweetItemId": "W_EXCEL_253",
@@ -6398,7 +6398,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 5,
         "rate": 40,
         "discountPercentage": 20,
-        "amount": 160
+        "amount": 40
       },
       {
         "sweetItemId": "W_EXCEL_72",
@@ -6409,7 +6409,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 1,
         "rate": 200,
         "discountPercentage": 20,
-        "amount": 160
+        "amount": 40
       },
       {
         "sweetItemId": "W_EXCEL_74",
@@ -6420,10 +6420,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 1,
         "rate": 180,
         "discountPercentage": 20,
-        "amount": 144
+        "amount": 36
       }
     ],
-    "totalAmount": 1024,
+    "totalAmount": 256,
     "status": "Completed"
   },
   {
@@ -6442,7 +6442,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 10,
         "rate": 20,
         "discountPercentage": 20,
-        "amount": 160
+        "amount": 40
       },
       {
         "sweetItemId": "W_EXCEL_395",
@@ -6453,7 +6453,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 5,
         "rate": 30,
         "discountPercentage": 20,
-        "amount": 120
+        "amount": 30
       },
       {
         "sweetItemId": "W_EXCEL_240",
@@ -6464,7 +6464,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 10,
         "rate": 15,
         "discountPercentage": 20,
-        "amount": 120
+        "amount": 30
       },
       {
         "sweetItemId": "W_EXCEL_276",
@@ -6475,7 +6475,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 10,
         "rate": 20,
         "discountPercentage": 20,
-        "amount": 160
+        "amount": 40
       },
       {
         "sweetItemId": "W_EXCEL_1",
@@ -6486,10 +6486,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 10,
         "rate": 20,
         "discountPercentage": 20,
-        "amount": 160
+        "amount": 40
       }
     ],
-    "totalAmount": 720,
+    "totalAmount": 180,
     "status": "Completed"
   },
   {
@@ -6508,7 +6508,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 10,
         "rate": 20,
         "discountPercentage": 20,
-        "amount": 160
+        "amount": 40
       },
       {
         "sweetItemId": "W_EXCEL_272",
@@ -6519,7 +6519,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 15,
         "rate": 25,
         "discountPercentage": 20,
-        "amount": 300
+        "amount": 75
       },
       {
         "sweetItemId": "W_EXCEL_427",
@@ -6530,10 +6530,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 10,
         "rate": 15,
         "discountPercentage": 20,
-        "amount": 120
+        "amount": 30
       }
     ],
-    "totalAmount": 580,
+    "totalAmount": 145,
     "status": "Completed"
   },
   {
@@ -6552,7 +6552,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 10,
         "rate": 40,
         "discountPercentage": 20,
-        "amount": 320
+        "amount": 80
       },
       {
         "sweetItemId": "W_EXCEL_154",
@@ -6563,7 +6563,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 2,
         "rate": 60,
         "discountPercentage": 20,
-        "amount": 96
+        "amount": 24
       },
       {
         "sweetItemId": "W_EXCEL_276",
@@ -6574,7 +6574,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 10,
         "rate": 20,
         "discountPercentage": 20,
-        "amount": 160
+        "amount": 40
       },
       {
         "sweetItemId": "W_EXCEL_29",
@@ -6585,7 +6585,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 5,
         "rate": 20,
         "discountPercentage": 20,
-        "amount": 80
+        "amount": 20
       },
       {
         "sweetItemId": "W_EXCEL_475",
@@ -6596,10 +6596,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 5,
         "rate": 70,
         "discountPercentage": 20,
-        "amount": 280
+        "amount": 70
       }
     ],
-    "totalAmount": 936,
+    "totalAmount": 234,
     "status": "Completed"
   },
   {
@@ -6618,7 +6618,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 3,
         "rate": 60,
         "discountPercentage": 25,
-        "amount": 135
+        "amount": 45
       },
       {
         "sweetItemId": "W_EXCEL_356",
@@ -6629,7 +6629,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 3,
         "rate": 40,
         "discountPercentage": 25,
-        "amount": 90
+        "amount": 30
       },
       {
         "sweetItemId": "W_EXCEL_434",
@@ -6640,7 +6640,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 3,
         "rate": 20,
         "discountPercentage": 25,
-        "amount": 45
+        "amount": 15
       },
       {
         "sweetItemId": "W_EXCEL_276",
@@ -6651,10 +6651,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 10,
         "rate": 20,
         "discountPercentage": 25,
-        "amount": 150
+        "amount": 50
       }
     ],
-    "totalAmount": 420,
+    "totalAmount": 140,
     "status": "Completed"
   },
   {
@@ -6673,7 +6673,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 5,
         "rate": 300,
         "discountPercentage": 25,
-        "amount": 1125
+        "amount": 375
       },
       {
         "sweetItemId": "W_EXCEL_385",
@@ -6684,7 +6684,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 5.802,
         "rate": 50,
         "discountPercentage": 0,
-        "amount": 290
+        "amount": 0
       },
       {
         "sweetItemId": "W_EXCEL_21",
@@ -6695,7 +6695,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 135,
         "rate": 24,
         "discountPercentage": 0,
-        "amount": 3240
+        "amount": 0
       },
       {
         "sweetItemId": "W_EXCEL_331",
@@ -6706,7 +6706,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 1.014,
         "rate": 560,
         "discountPercentage": 25,
-        "amount": 426
+        "amount": 141.96
       },
       {
         "sweetItemId": "W_EXCEL_326",
@@ -6714,10 +6714,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "grossWeight": 4.022,
         "trayWeight": 0.628,
         "wastage": 3,
-        "netWeight": 3.2922,
+        "netWeight": 3.29218,
         "rate": 520,
         "discountPercentage": 25,
-        "amount": 1284
+        "amount": 427.9834
       },
       {
         "sweetItemId": "W_EXCEL_314",
@@ -6725,10 +6725,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "grossWeight": 3.516,
         "trayWeight": 0.648,
         "wastage": 3,
-        "netWeight": 2.782,
+        "netWeight": 2.7819599999999998,
         "rate": 300,
         "discountPercentage": 25,
-        "amount": 626
+        "amount": 208.64700000000002
       },
       {
         "sweetItemId": "W_EXCEL_334",
@@ -6736,10 +6736,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "grossWeight": 3.222,
         "trayWeight": 0.646,
         "wastage": 3,
-        "netWeight": 2.4987,
+        "netWeight": 2.49872,
         "rate": 260,
         "discountPercentage": 25,
-        "amount": 487
+        "amount": 162.4168
       },
       {
         "sweetItemId": "W_EXCEL_326",
@@ -6747,10 +6747,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "grossWeight": 4.036,
         "trayWeight": 0.674,
         "wastage": 3,
-        "netWeight": 3.2611,
+        "netWeight": 3.2611399999999997,
         "rate": 520,
         "discountPercentage": 25,
-        "amount": 1272
+        "amount": 423.9482
       },
       {
         "sweetItemId": "W_EXCEL_326",
@@ -6758,10 +6758,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "grossWeight": 3.572,
         "trayWeight": 0.77,
         "wastage": 3,
-        "netWeight": 2.7179,
+        "netWeight": 2.71794,
         "rate": 520,
         "discountPercentage": 25,
-        "amount": 1060
+        "amount": 353.3322
       },
       {
         "sweetItemId": "W_EXCEL_331",
@@ -6769,10 +6769,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "grossWeight": 3.106,
         "trayWeight": 0.67,
         "wastage": 3,
-        "netWeight": 2.3629,
+        "netWeight": 2.36292,
         "rate": 560,
         "discountPercentage": 25,
-        "amount": 992
+        "amount": 330.80879999999996
       },
       {
         "sweetItemId": "W_EXCEL_326",
@@ -6780,10 +6780,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "grossWeight": 2.72,
         "trayWeight": 0.634,
         "wastage": 3,
-        "netWeight": 2.0234,
+        "netWeight": 2.02342,
         "rate": 520,
         "discountPercentage": 25,
-        "amount": 789
+        "amount": 263.0446
       },
       {
         "sweetItemId": "W_EXCEL_109",
@@ -6791,10 +6791,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "grossWeight": 1.144,
         "trayWeight": 0.428,
         "wastage": 3,
-        "netWeight": 0.6945,
+        "netWeight": 0.69452,
         "rate": 460,
         "discountPercentage": 25,
-        "amount": 240
+        "amount": 79.8698
       },
       {
         "sweetItemId": "W_EXCEL_474",
@@ -6802,10 +6802,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "grossWeight": 4.43,
         "trayWeight": 0.488,
         "wastage": 3,
-        "netWeight": 3.8237,
+        "netWeight": 3.8237399999999995,
         "rate": 380,
         "discountPercentage": 25,
-        "amount": 1090
+        "amount": 363.2553
       },
       {
         "sweetItemId": "W_EXCEL_361",
@@ -6813,13 +6813,13 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "grossWeight": 3.834,
         "trayWeight": 0,
         "wastage": 3,
-        "netWeight": 3.719,
+        "netWeight": 3.71898,
         "rate": 300,
         "discountPercentage": 25,
-        "amount": 837
+        "amount": 278.9235
       }
     ],
-    "totalAmount": 13758,
+    "totalAmount": 3409,
     "status": "Completed"
   },
   {
@@ -6835,10 +6835,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "grossWeight": 1.898,
         "trayWeight": 0.654,
         "wastage": 3,
-        "netWeight": 1.2067,
+        "netWeight": 1.2066799999999998,
         "rate": 380,
         "discountPercentage": 23,
-        "amount": 353
+        "amount": 105.46383199999998
       },
       {
         "sweetItemId": "W_EXCEL_350",
@@ -6846,10 +6846,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "grossWeight": 1.548,
         "trayWeight": 0.508,
         "wastage": 3,
-        "netWeight": 1.0088,
+        "netWeight": 1.0088000000000001,
         "rate": 520,
         "discountPercentage": 23,
-        "amount": 404
+        "amount": 120.65248
       },
       {
         "sweetItemId": "W_EXCEL_362",
@@ -6860,7 +6860,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 2.3862,
         "rate": 260,
         "discountPercentage": 23,
-        "amount": 478
+        "amount": 142.69476
       },
       {
         "sweetItemId": "W_EXCEL_309",
@@ -6868,10 +6868,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "grossWeight": 3.346,
         "trayWeight": 0.644,
         "wastage": 3,
-        "netWeight": 2.6209,
+        "netWeight": 2.62094,
         "rate": 230,
         "discountPercentage": 0,
-        "amount": 603
+        "amount": 0
       },
       {
         "sweetItemId": "W_EXCEL_249",
@@ -6879,10 +6879,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "grossWeight": 2.306,
         "trayWeight": 0.61,
         "wastage": 3,
-        "netWeight": 1.6451,
+        "netWeight": 1.6451200000000004,
         "rate": 300,
         "discountPercentage": 23,
-        "amount": 380
+        "amount": 113.51328000000004
       },
       {
         "sweetItemId": "W_EXCEL_420",
@@ -6893,10 +6893,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 15,
         "rate": 35,
         "discountPercentage": 23,
-        "amount": 404
+        "amount": 120.75
       }
     ],
-    "totalAmount": 2622,
+    "totalAmount": 603,
     "status": "Completed"
   },
   {
@@ -6915,10 +6915,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 2.48,
         "rate": 260,
         "discountPercentage": 20,
-        "amount": 516
+        "amount": 128.96
       }
     ],
-    "totalAmount": 516,
+    "totalAmount": 129,
     "status": "Completed"
   },
   {
@@ -6937,7 +6937,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 1,
         "rate": 350,
         "discountPercentage": 25,
-        "amount": 263
+        "amount": 87.5
       },
       {
         "sweetItemId": "W_EXCEL_186",
@@ -6948,7 +6948,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 6,
         "rate": 65,
         "discountPercentage": 25,
-        "amount": 293
+        "amount": 97.5
       },
       {
         "sweetItemId": "W_EXCEL_195",
@@ -6959,7 +6959,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 6,
         "rate": 75,
         "discountPercentage": 25,
-        "amount": 338
+        "amount": 112.5
       },
       {
         "sweetItemId": "W_EXCEL_238",
@@ -6970,10 +6970,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 6,
         "rate": 50,
         "discountPercentage": 25,
-        "amount": 225
+        "amount": 75
       }
     ],
-    "totalAmount": 1119,
+    "totalAmount": 373,
     "status": "Completed"
   },
   {
@@ -6992,7 +6992,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 6,
         "rate": 50,
         "discountPercentage": 23,
-        "amount": 231
+        "amount": 69
       },
       {
         "sweetItemId": "W_EXCEL_186",
@@ -7003,10 +7003,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 6,
         "rate": 65,
         "discountPercentage": 23,
-        "amount": 300
+        "amount": 89.7
       }
     ],
-    "totalAmount": 531,
+    "totalAmount": 159,
     "status": "Completed"
   },
   {
@@ -7025,7 +7025,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 31,
         "rate": 25,
         "discountPercentage": 20,
-        "amount": 620
+        "amount": 155
       },
       {
         "sweetItemId": "W_EXCEL_462",
@@ -7036,7 +7036,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 6,
         "rate": 50,
         "discountPercentage": 20,
-        "amount": 240
+        "amount": 60
       },
       {
         "sweetItemId": "W_EXCEL_283",
@@ -7047,7 +7047,7 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 5,
         "rate": 70,
         "discountPercentage": 20,
-        "amount": 280
+        "amount": 70
       },
       {
         "sweetItemId": "W_EXCEL_273",
@@ -7058,10 +7058,10 @@ export const INITIAL_TRIPS: TripEntry[] = [
         "netWeight": 5,
         "rate": 80,
         "discountPercentage": 20,
-        "amount": 320
+        "amount": 80
       }
     ],
-    "totalAmount": 1460,
+    "totalAmount": 365,
     "status": "Completed"
   }
 ];

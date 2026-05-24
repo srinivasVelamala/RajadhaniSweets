@@ -65,7 +65,7 @@ export default function Reports({
   };
 
   const handleExportMock = (format: 'pdf' | 'excel') => {
-    alert(`Successfully generated report formatting. Saved in your reports directory: reports/Rajdhani_${activeReport}_Report_2026.${format}`);
+    alert(`Successfully generated report formatting. Saved in your reports directory: reports/Rajadhani_${activeReport}_Report_2026.${format}`);
   };
 
   return (
@@ -76,7 +76,7 @@ export default function Reports({
             <FileBarChart className="text-amber-500 w-6 h-6 shrink-0" />
             Dynamic Report Suite
           </h2>
-          <p className="text-sm text-slate-400">Generate, customize, filter, and export PDF/Excel/Print sheets for all Rajdhani Sweets operations</p>
+          <p className="text-sm text-slate-400">Generate, customize, filter, and export PDF/Excel/Print sheets for all Rajadhani Sweets operations</p>
         </div>
 
         {/* Action controls */}
@@ -147,23 +147,17 @@ export default function Reports({
               className="px-2.5 py-1 bg-slate-950 border border-slate-800 rounded cursor-pointer text-slate-300 font-mono focus:outline-none focus:border-amber-500 text-xs"
             >
               <option value="All">All Registered Shops</option>
-              {[...shops].sort((a, b) => {
-                const nameA = a.name.toLowerCase().trim();
-                const nameB = b.name.toLowerCase().trim();
-                const indexA = EXCEL_SHOP_ORDER.indexOf(nameA);
-                const indexB = EXCEL_SHOP_ORDER.indexOf(nameB);
-
-                const aInSeq = indexA >= 0;
-                const bInSeq = indexB >= 0;
-
-                if (aInSeq && !bInSeq) return -1;
-                if (!aInSeq && bInSeq) return 1;
-                if (aInSeq && bInSeq) return indexA - indexB;
-
-                return a.name.localeCompare(b.name);
-              }).map(s => (
-                <option key={s.id} value={s.id}>{s.name}</option>
-              ))}
+              {[...shops]
+                .filter(s => EXCEL_SHOP_ORDER.includes(s.name.toLowerCase().trim()))
+                .sort((a, b) => {
+                  const nameA = a.name.toLowerCase().trim();
+                  const nameB = b.name.toLowerCase().trim();
+                  const indexA = EXCEL_SHOP_ORDER.indexOf(nameA);
+                  const indexB = EXCEL_SHOP_ORDER.indexOf(nameB);
+                  return indexA - indexB;
+                }).map(s => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
             </select>
           </div>
         )}
@@ -210,8 +204,8 @@ export default function Reports({
         <div className="border-b border-slate-800 pb-5 flex flex-col md:flex-row items-start justify-between gap-4 font-sans">
           <div>
             <span className="text-[10px] uppercase font-mono tracking-widest text-amber-500 font-bold block mb-1">REGISTERED TAX INVOICE LEDGER</span>
-            <h1 className="text-xl font-bold text-slate-100 mb-0">Rajdhani Sweets Manufacturing & Co.</h1>
-            <p className="text-xs text-slate-500 leading-normal">Plot #54, Industrial Sourcing Zone, Lane 2, Bangalore, Karnataka</p>
+            <h1 className="text-xl font-bold text-slate-100 mb-0">Rajadhani Sweets</h1>
+            <p className="text-xs text-slate-500 leading-normal">Seven road junction, Srikakulam</p>
           </div>
 
           <div className="text-left md:text-right text-xs font-mono">
@@ -376,6 +370,7 @@ export default function Reports({
                 </thead>
                 <tbody className="divide-y divide-slate-800">
                   {shops
+                    .filter(s => EXCEL_SHOP_ORDER.includes(s.name.toLowerCase().trim()))
                     .filter(s => filterShopId === 'All' || s.id === filterShopId)
                     .map((sh) => {
                       // Sum all historic purchases for this shop
@@ -522,7 +517,9 @@ export default function Reports({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800">
-                  {shops.map((sh) => (
+                  {shops
+                    .filter(sh => EXCEL_SHOP_ORDER.includes(sh.name.toLowerCase().trim()))
+                    .map((sh) => (
                     <tr key={sh.id} className="hover:bg-slate-950/20">
                       <td className="p-3 font-bold text-slate-200">{sh.name}</td>
                       <td className="p-3">{sh.owner} ({sh.mobile})</td>
@@ -598,6 +595,6 @@ function presets_name(preset: ReportType): string {
     case 'wastage': return 'Tray weight leakage and scrap wastage tracking';
     case 'pending': return 'Shop pending credits and credit days warnings';
     case 'profit': return 'Net profit margin business registers';
-    default: return 'Rajdhani Sweets operational report ledger';
+    default: return 'Rajadhani Sweets operational report ledger';
   }
 }

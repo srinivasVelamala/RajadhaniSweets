@@ -1,7 +1,6 @@
 import { 
   LayoutDashboard, Store, Candy, Flame, Truck, 
-  FileSpreadsheet, FileBarChart, Terminal, Keyboard,
-  Package, Receipt, Users
+  FileSpreadsheet, FileBarChart, BrainCircuit, Terminal, Keyboard 
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -23,40 +22,32 @@ export default function Sidebar({
 }: SidebarProps) {
   
   const menuItems: Array<{ id: string; name: string; icon: any; highlight?: boolean; badge?: string }> = [
-    { id: 'dashboard',  name: 'Dashboard',        icon: LayoutDashboard },
-    { id: 'shops',      name: 'Shop Master',       icon: Store },
-    { id: 'items',      name: 'Item Master',       icon: Candy },
-    { id: 'production', name: 'Daily Production',  icon: Flame },
-    { id: 'dispatches', name: 'Dispatches',        icon: Truck },
-    { id: 'inventory',  name: 'Inventory',         icon: Package },
-    { id: 'expenses',   name: 'Expenses',          icon: Receipt },
-    { id: 'workers',    name: 'Workers',           icon: Users },
-    { id: 'excel',      name: 'Excel Migration',   icon: FileSpreadsheet },
-    { id: 'reports',    name: 'Export Reports',    icon: FileBarChart },
-    { id: 'desktop',    name: 'Desktop Dist Kit',  icon: Terminal, highlight: true },
+    { id: 'dashboard', name: 'Dashboard', icon: LayoutDashboard },
+    { id: 'shops', name: 'Shop Master', icon: Store },
+    { id: 'items', name: 'Item Master', icon: Candy },
+    { id: 'production', name: 'Daily Production', icon: Flame },
+    { id: 'migration', name: 'Excel Migration', icon: FileSpreadsheet },
+    { id: 'reports', name: 'Export Reports', icon: FileBarChart },
+    { id: 'desktop', name: 'Desktop Dist Kit', icon: Terminal, highlight: true }
   ];
 
   return (
-    <aside className="w-full flex flex-col h-full" style={{ background: 'linear-gradient(180deg,#1a3363 0%,#1e3a8a 40%,#1e40af 100%)' }}>
-      
+    <aside className="w-full flex flex-col h-full text-slate-100">
       {/* Brand Header */}
-      <div className="px-5 py-5 flex flex-col justify-center" style={{ borderBottom: '1px solid rgba(255,255,255,0.12)' }}>
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center font-extrabold text-blue-900 shadow-lg text-sm"
-            style={{ background: 'linear-gradient(135deg,#fde68a,#f59e0b)', boxShadow: '0 4px 14px rgba(245,158,11,0.4)' }}>
-            🍬
+      <div className="p-6 border-b border-slate-800 flex flex-col justify-center">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center font-bold text-slate-900 shadow-md shadow-amber-500/10">
+            RS
           </div>
           <div>
-            <h1 className="text-base font-bold tracking-tight text-white leading-tight">Rajdhani Sweets</h1>
-            <p className="text-[10px] font-mono tracking-widest uppercase" style={{ color: 'rgba(253,230,138,0.85)' }}>
-              Manufacturing ERP
-            </p>
+            <h1 className="text-lg font-bold tracking-tight text-white mb-0">Rajadhani Sweets</h1>
+            <p className="text-[10px] font-mono tracking-wide text-amber-500 uppercase">Manufacturing ERP</p>
           </div>
         </div>
       </div>
 
       {/* Navigation Links */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
+      <nav className="flex-1 overflow-y-auto px-4 py-6 space-y-1">
         {menuItems.map((item) => {
           const IconComponent = item.icon;
           const isActive = currentTab === item.id;
@@ -64,28 +55,22 @@ export default function Sidebar({
             <button
               key={item.id}
               onClick={() => setCurrentTab(item.id)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group ${
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all group ${
                 isActive 
-                  ? 'text-blue-900 shadow-md font-semibold'
+                  ? 'bg-amber-500 text-slate-950 font-semibold shadow-lg shadow-amber-500/10' 
                   : item.highlight 
-                    ? 'hover:bg-white/10 border border-yellow-300/25 hover:border-yellow-300/50'
-                    : 'hover:bg-white/10'
+                    ? 'hover:bg-slate-800/80 text-amber-400 border border-amber-500/20 hover:border-amber-500/40'
+                    : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/60'
               }`}
-              style={isActive ? {
-                background: 'linear-gradient(135deg,#fde68a,#fbbf24)',
-                boxShadow: '0 4px 14px rgba(251,191,36,0.35)'
-              } : {
-                color: isActive ? undefined : item.highlight ? 'rgba(253,230,138,0.9)' : 'rgba(255,255,255,0.72)'
-              }}
             >
-              <IconComponent className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${
-                isActive ? 'text-blue-900' : ''
+              <IconComponent className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-105 ${
+                isActive ? 'text-slate-950' : item.highlight ? 'text-amber-400' : 'text-slate-400'
               }`} />
               <span className="truncate">{item.name}</span>
               
               {item.badge && (
                 <span className={`ml-auto text-[9px] px-1.5 py-0.5 rounded font-mono font-bold tracking-wider ${
-                  isActive ? 'bg-blue-900/20 text-blue-900' : 'bg-yellow-300/20 text-yellow-200'
+                  isActive ? 'bg-slate-950 text-amber-500' : 'bg-amber-500/20 text-amber-400'
                 }`}>
                   {item.badge}
                 </span>
@@ -95,50 +80,60 @@ export default function Sidebar({
         })}
       </nav>
 
-      {/* Sidebar Controls */}
-      <div className="p-4 space-y-3" style={{ borderTop: '1px solid rgba(255,255,255,0.12)', background: 'rgba(0,0,0,0.15)' }}>
+      {/* Sidebar Controls (Roles and Keys Mode) */}
+      <div className="p-4 border-t border-slate-800 space-y-4 bg-slate-950/40">
+        {/* Fast Keyboard mode Toggle */}
         <button 
           onClick={() => setFastEntryMode(!fastEntryMode)}
-          className={`w-full py-2 px-3 rounded-lg text-xs font-mono flex items-center justify-between transition-all ${
+          className={`w-full py-1.5 px-3 rounded text-xs font-mono flex items-center justify-between transition-colors ${
             fastEntryMode 
-              ? 'text-emerald-200 border border-emerald-400/40' 
-              : 'text-white/50 hover:text-white/80 border border-white/10 hover:border-white/20'
+              ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
+              : 'bg-slate-800/40 text-slate-400 hover:bg-slate-800/80 border border-slate-800'
           }`}
-          style={fastEntryMode ? { background: 'rgba(52,211,153,0.15)' } : { background: 'rgba(255,255,255,0.06)' }}
         >
           <span className="flex items-center gap-1.5">
             <Keyboard className="w-3.5 h-3.5" />
             FAST KEYBOARD ENTRY
           </span>
-          <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${fastEntryMode ? 'bg-emerald-500/30 text-emerald-300' : 'bg-white/10 text-white/40'}`}>
+          <span className="text-[10px] font-bold">
             {fastEntryMode ? 'ON' : 'OFF'}
           </span>
         </button>
 
+        {/* User Role Selector */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-[10px] font-semibold uppercase tracking-widest block" style={{ color: 'rgba(255,255,255,0.4)' }}>
+          <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest block">
             User Role Privilege
           </label>
-          <div className="grid grid-cols-2 gap-1 p-0.5 rounded-xl" style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.1)' }}>
-            {(['Admin','Operator'] as const).map(role => (
-              <button
-                key={role}
-                onClick={() => setUserRole(role)}
-                className={`py-1.5 text-xs font-semibold rounded-lg transition-all ${
-                  userRole === role ? 'text-blue-900 shadow-sm' : 'text-white/50 hover:text-white/80'
-                }`}
-                style={userRole === role ? { background: 'linear-gradient(135deg,#fde68a,#fbbf24)' } : {}}
-              >
-                {role}
-              </button>
-            ))}
+          <div className="grid grid-cols-2 gap-1 p-0.5 bg-slate-900 rounded-lg border border-slate-800">
+            <button
+              onClick={() => setUserRole('Admin')}
+              className={`py-1 text-xs font-medium rounded-md transition-all ${
+                userRole === 'Admin'
+                  ? 'bg-slate-800 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              Admin
+            </button>
+            <button
+              onClick={() => setUserRole('Operator')}
+              className={`py-1 text-xs font-medium rounded-md transition-all ${
+                userRole === 'Operator'
+                  ? 'bg-slate-800 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              Operator
+            </button>
           </div>
         </div>
 
-        <div className="text-center pt-1">
-          <p className="text-[9px] font-mono" style={{ color: 'rgba(255,255,255,0.3)' }}>Rajdhani Mobile Sync 1.0.4</p>
-          <p className="text-[8px] font-mono flex items-center justify-center gap-1 mt-0.5" style={{ color: 'rgba(52,211,153,0.8)' }}>
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse"></span>
+        {/* Brand System Info */}
+        <div className="text-center">
+          <p className="text-[9px] font-mono text-slate-600 mb-0">Rajadhani Mobile Sync 1.0.4</p>
+          <p className="text-[8px] font-mono text-emerald-500 flex items-center justify-center gap-1 mt-0.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
             OFFLINE DATABASE ONLINE
           </p>
         </div>

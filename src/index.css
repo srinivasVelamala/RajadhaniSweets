@@ -4,130 +4,97 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
-  --color-white: #0f172a;
-  --color-slate-100: #0f172a;
-  --color-slate-200: #1e3a8a;
+  /* Redefine Slate color coordinates to high-contrast Light/Ice-Blue and charcoal theme specs */
+  --color-white: #0f172a; /* Redefine white text variables for excellent dark contrast */
+  --color-slate-100: #0f172a; /* Title and heavy text */
+  --color-slate-200: #1e3a8a; /* Deep Royal/Navy Blue headings */
   --color-slate-201: #1e40af; 
   --color-slate-205: #1e3a8a;
-  --color-slate-300: #1e293b;
+  --color-slate-300: #1e293b; /* Body and heavy info labels */
   --color-slate-350: #192231;
-  --color-slate-400: #334155;
+  --color-slate-400: #334155; /* Regular body description text */
   --color-slate-450: #475569;
-  --color-slate-500: #475569;
+  --color-slate-500: #475569; /* Soft labels */
   --color-slate-550: #64748b;
   --color-slate-600: #64748b;
   --color-slate-650: #94a3b8;
-  --color-slate-700: #94a3b8;
-  --color-slate-800: #cbd5e1;
-  --color-slate-850: #f1f5f9;
-  --color-slate-900: #ffffff;
-  --color-slate-950: #fdf6ee;
+  --color-slate-700: #94a3b8; /* Outlines/grid lines */
+  --color-slate-800: #cbd5e1; /* Subtle divider borders */
+  --color-slate-850: #f1f5f9; /* Light panels highlight/form inputs background */
+  --color-slate-900: #ffffff; /* Squeaky clean pure white paper cards and sidebar */
+  --color-slate-950: #f8fafc; /* Beautiful soft Ice-Blue canvas background */
 
+  /* Map Amber coordinates to Brilliant Royal/Sky Blue accent highlights */
   --color-amber-100: #dbeafe;
   --color-amber-200: #93c5fd;
   --color-amber-305: #60a5fa;
-  --color-amber-400: #3b82f6;
-  --color-amber-500: #2563eb;
+  --color-amber-400: #3b82f6; /* Accent skies */
+  --color-amber-500: #2563eb; /* Classic Royal Blue triggers and buttons */
   --color-amber-550: #1d4ed8;
-  --color-amber-600: #1d4ed8;
+  --color-amber-600: #1d4ed8; /* Darker royal blue on button active triggers */
 }
 
+/* Base resets & custom typography scrollbars */
 html {
   font-family: var(--font-sans);
   background-color: var(--color-slate-950);
 }
 
-/* ── Sweet-themed decorative background ────────────────────────────────────── */
-.sweet-bg {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-  z-index: 0;
+/* Webkit scrollbars styling for modern clean light panels */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
-.sweet-bg::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image:
-    radial-gradient(ellipse 80% 50% at 20% 10%, rgba(251,191,36,0.08) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(234,179,8,0.07) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 60% at 60% 30%, rgba(251,146,60,0.05) 0%, transparent 55%);
+::-webkit-scrollbar-track {
+  background: var(--color-slate-950);
 }
 
-.sweet-particle {
-  position: absolute;
-  font-size: 2.2rem;
-  opacity: 0.07;
-  animation: sweetFloat linear infinite;
-  user-select: none;
-  filter: blur(0.3px) saturate(1.4);
+::-webkit-scrollbar-thumb {
+  background: var(--color-slate-800);
+  border-radius: 4px;
 }
 
-@keyframes sweetFloat {
-  0%   { transform: translateY(0px) rotate(0deg) scale(1); }
-  25%  { transform: translateY(-18px) rotate(8deg) scale(1.04); }
-  50%  { transform: translateY(-6px) rotate(-5deg) scale(0.97); }
-  75%  { transform: translateY(-22px) rotate(12deg) scale(1.02); }
-  100% { transform: translateY(0px) rotate(0deg) scale(1); }
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-slate-700);
 }
 
-/* ── Scrollbars ──────────────────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: #f1f5f9; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-/* ── Glassmorphism utility ───────────────────────────────────────────────── */
-.glass-card {
-  background: rgba(255,255,255,0.72);
-  backdrop-filter: blur(18px) saturate(1.4);
-  -webkit-backdrop-filter: blur(18px) saturate(1.4);
-  border: 1px solid rgba(255,255,255,0.85);
-  box-shadow: 0 2px 20px rgba(0,0,0,0.055), 0 1px 4px rgba(0,0,0,0.04);
+/* Micro-interaction animation utilities */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-.glass-card-hover {
-  transition: box-shadow 0.2s, border-color 0.2s, transform 0.18s;
-}
-.glass-card-hover:hover {
-  box-shadow: 0 6px 32px rgba(37,99,235,0.10), 0 2px 8px rgba(0,0,0,0.06);
-  border-color: rgba(59,130,246,0.35);
-  transform: translateY(-1px);
+@keyframes slideUp {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
-/* ── Metric card gradient icon backgrounds ───────────────────────────────── */
-.icon-bg-amber   { background: linear-gradient(135deg, #fef9c3 0%, #fde68a 100%); }
-.icon-bg-indigo  { background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); }
-.icon-bg-emerald { background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); }
-.icon-bg-rose    { background: linear-gradient(135deg, #ffe4e6 0%, #fecdd3 100%); }
-.icon-bg-yellow  { background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); }
-.icon-bg-red     { background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); }
-.icon-bg-cyan    { background: linear-gradient(135deg, #cffafe 0%, #a5f3fc 100%); }
-
-/* ── Animations ──────────────────────────────────────────────────────────── */
-@keyframes fadeIn   { from { opacity:0; }                    to { opacity:1; } }
-@keyframes slideUp  { from { transform:translateY(14px); opacity:0; } to { transform:translateY(0); opacity:1; } }
-@keyframes scaleIn  { from { transform:scale(0.96); opacity:0; } to { transform:scale(1); opacity:1; } }
 @keyframes pulseBorder {
-  0%,100% { border-color: rgba(37,99,235,0.15); }
-  50%     { border-color: rgba(37,99,235,0.45); }
+  0%, 100% { border-color: rgba(37, 99, 235, 0.2); }
+  50% { border-color: rgba(37, 99, 235, 0.5); }
 }
 
-.animate-fade-in    { animation: fadeIn   0.35s ease-out forwards; }
-.animate-slide-up   { animation: slideUp  0.3s  ease-out forwards; }
-.animate-scale-in   { animation: scaleIn  0.25s ease-out forwards; }
-.animate-border-pulse { animation: pulseBorder 2s infinite ease-in-out; }
-
-/* ── Sidebar gradient ────────────────────────────────────────────────────── */
-.sidebar-gradient {
-  background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 35%, #1d4ed8 100%);
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
 }
 
-/* ── Print ───────────────────────────────────────────────────────────────── */
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out forwards;
+}
+
+.animate-border-pulse {
+  animation: pulseBorder 2s infinite ease-in-out;
+}
+
 @media print {
-  .print\:hidden  { display:none !important; }
-  .print\:p-0     { padding:0 !important; }
-  .print\:m-0     { margin:0 !important; }
+  .print\:hidden {
+    display: none !important;
+  }
+  .print\:p-0 {
+    padding: 0 !important;
+  }
+  .print\:m-0 {
+    margin: 0 !important;
+  }
 }

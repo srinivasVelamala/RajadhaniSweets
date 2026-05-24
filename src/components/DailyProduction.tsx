@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Flame, Plus, Search, Calendar, Award, Receipt, Percent, HelpCircle, Save, RotateCcw, FileSpreadsheet, List, ShieldAlert, CheckCircle2, ShoppingBag, ArrowRight, Copy, Scissors, Trash2, Sliders, CheckSquare, Info, RefreshCw, Loader2
+  Flame, Plus, Search, Calendar, Award, Receipt, Percent, HelpCircle, Save, RotateCcw, FileSpreadsheet, List, ShieldAlert, CheckCircle2, ShoppingBag, ArrowRight, Copy, Scissors, Trash2, Sliders, CheckSquare, Info
 } from 'lucide-react';
 import { ProductionEntry, SweetItem, TripEntry, Shop } from '../types';
 
@@ -147,7 +147,6 @@ interface DailyProductionProps {
   onSaveBulkProduction?: (date: string, entries: Omit<ProductionEntry, 'id'>[]) => void;
   onAddDispatch: (entry: Omit<TripEntry, 'id'>) => void;
   onUpdateDispatch: (entry: TripEntry) => void;
-  onSyncFromExcel?: () => Promise<{ added: number; date: string } | null>;
   userRole: 'Admin' | 'Operator';
 }
 
@@ -160,26 +159,10 @@ export default function DailyProduction({
   onSaveBulkProduction,
   onAddDispatch,
   onUpdateDispatch,
-  onSyncFromExcel,
   userRole
 }: DailyProductionProps) {
   const [selectedDate, setSelectedDate] = useState('2026-05-24');
-  const [syncing, setSyncing] = useState(false);
-  const [syncResult, setSyncResult] = useState<{ added: number; date: string } | null>(null);
-
-  const handleExcelSync = async () => {
-    if (!onSyncFromExcel) return;
-    setSyncing(true);
-    setSyncResult(null);
-    const result = await onSyncFromExcel();
-    setSyncing(false);
-    if (result) {
-      setSyncResult(result);
-      setSelectedDate(result.date);
-      setTimeout(() => setSyncResult(null), 5000);
-    }
-  };
-
+  
   // Selected tab: 'all' is Consolidated Kitchen Summary, others are shopIds
   const [selectedShopId, setSelectedShopId] = useState<string>('all');
   
@@ -224,7 +207,7 @@ export default function DailyProduction({
     const dailyDispatches = dispatches.filter(d => d.date === selectedDate);
     
     dailyDispatches.forEach(disp => {
-      const shopAllots: Record<string, any> = {};
+      const shopAllots = { ...(initialAllotments[disp.shopId] || {}) };
       disp.items.forEach(itm => {
         shopAllots[itm.sweetItemId] = {
           grossWeight: String(itm.grossWeight || ''),
@@ -389,30 +372,18 @@ export default function DailyProduction({
 
   const activeKitchenItems = getKitchenSummary();
 
-  // Search filter shops, sorted to put excel shops at the top in the correct order
+  // Search filter shops, specifically synchronized with the 9 shops in the daily disbursement excel sheet
   const filteredShopsList = shops.filter(sh => {
+    const nameLower = sh.name.toLowerCase().trim();
+    const isExcelDailyShop = EXCEL_SHOP_ORDER.includes(nameLower);
     const matchesSearch = sh.name.toLowerCase().includes(shopFilterQuery.toLowerCase());
-    return sh.active && matchesSearch;
+    return sh.active && isExcelDailyShop && matchesSearch;
   }).sort((a, b) => {
     const nameA = a.name.toLowerCase().trim();
     const nameB = b.name.toLowerCase().trim();
     const indexA = EXCEL_SHOP_ORDER.indexOf(nameA);
     const indexB = EXCEL_SHOP_ORDER.indexOf(nameB);
-
-    const aInSeq = indexA >= 0;
-    const bInSeq = indexB >= 0;
-
-    if (aInSeq && !bInSeq) {
-      return -1;
-    }
-    if (!aInSeq && bInSeq) {
-      return 1;
-    }
-    if (aInSeq && bInSeq) {
-      return indexA - indexB;
-    }
-
-    return a.name.localeCompare(b.name);
+    return indexA - indexB;
   });
 
   // Filter sweet items catalog on display
@@ -675,7 +646,7 @@ export default function DailyProduction({
         date: selectedDate,
         sweetItemId: c.item.id,
         sweetItemName: c.item.name,
-        quantityPrepared: Number(c.totalNet.toFixed(2)),
+        quantityPrepared: Number(c.totalGross.toFixed(3)),
         batchNumber: batchNum,
         notes: `Batch compiled from ${c.shopsUsed.length} retail shop shipments.`,
         expectedSales: Math.round(c.totalAmount)
@@ -711,27 +682,16 @@ export default function DailyProduction({
           </p>
         </div>
 
-        <div className="flex items-center gap-3 self-start md:self-auto flex-wrap">
-          {/* SYNC FROM EXCEL BUTTON */}
-          {onSyncFromExcel && (
-            <button
-              onClick={handleExcelSync}
-              disabled={syncing}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all shadow-md disabled:opacity-60"
-              style={{
-                background: syncing ? '#e2e8f0' : 'linear-gradient(135deg,#16a34a,#15803d)',
-                color: syncing ? '#64748b' : '#fff',
-                boxShadow: syncing ? 'none' : '0 4px 14px rgba(22,163,74,0.3)'
-              }}
-            >
-              {syncing
-                ? <><Loader2 className="w-4 h-4 animate-spin" /> Syncing Excel...</>
-                : <><RefreshCw className="w-4 h-4" /> Sync from Excel</>
-              }
-            </button>
-          )}
+        {/* ACTION BUTTON & DATE SELECTOR */}
+        <div className="flex flex-wrap items-center gap-3 self-start md:self-auto">
+          <button
+            onClick={handleSaveAllAllotments}
+            className="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 active:scale-95 text-slate-950 font-bold text-xs rounded-xl shadow-md hover:shadow-amber-500/15 transition-all flex items-center justify-center gap-1.5 font-sans tracking-wide shrink-0"
+          >
+            <Save className="w-4 h-4" />
+            <span>Save All Sheets</span>
+          </button>
 
-          {/* DATE SELECTOR */}
           <div className="flex items-center gap-3 bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 shadow-inner">
             <Calendar className="w-4 h-4 text-amber-500 shrink-0" />
             <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider font-mono">Date:</span>
@@ -744,22 +704,6 @@ export default function DailyProduction({
           </div>
         </div>
       </div>
-
-      {/* SYNC SUCCESS BANNER */}
-      {syncResult && (
-        <div className="flex items-center gap-3 p-4 rounded-xl animate-slide-up"
-          style={{ background: 'linear-gradient(135deg,#dcfce7,#bbf7d0)', border: '1px solid rgba(22,163,74,0.3)' }}>
-          <CheckCircle2 className="w-5 h-5 shrink-0" style={{ color: '#16a34a' }} />
-          <div>
-            <p className="text-sm font-bold" style={{ color: '#14532d' }}>
-              Excel Synced Successfully — {syncResult.added} production entries loaded for {syncResult.date}
-            </p>
-            <p className="text-xs mt-0.5" style={{ color: '#166534' }}>
-              Items, shops, production batches and dispatch trips from 24MAY26-SWEETS.xlsx are now active. Date filter set to {syncResult.date}.
-            </p>
-          </div>
-        </div>
-      )}
 
       {/* SUCCESS ALERTS */}
       {saveSuccess && (
