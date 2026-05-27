@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
-  Flame, Plus, Search, Calendar, Award, Receipt, Percent, HelpCircle, Save, RotateCcw, FileSpreadsheet, List, ShieldAlert, CheckCircle2, ShoppingBag, ArrowRight, Copy, Scissors, Trash2, Sliders, CheckSquare, Info
+  Flame, Plus, Search, Calendar, Award, Receipt, Percent, HelpCircle, Save, RotateCcw, FileSpreadsheet, List, ShieldAlert, CheckCircle2, ShoppingBag, ArrowRight, Copy, Scissors, Trash2, Sliders, CheckSquare, Info, Loader2
 } from 'lucide-react';
 import { ProductionEntry, SweetItem, TripEntry, Shop } from '../types';
 
@@ -168,6 +168,34 @@ export default function DailyProduction({
   userRole
 }: DailyProductionProps) {
   const [selectedDate, setSelectedDate] = useState('2026-05-24');
+
+  // Get yesterday's date relative to any string date
+  const getYesterday = (dateStr: string) => {
+    try {
+      const parts = dateStr.split('-');
+      if (parts.length !== 3) return dateStr;
+      const year = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1;
+      const day = parseInt(parts[2], 10);
+      const tempDate = new Date(year, month, day);
+      tempDate.setDate(tempDate.getDate() - 1);
+      const y = tempDate.getFullYear();
+      const m = String(tempDate.getMonth() + 1).padStart(2, '0');
+      const d = String(tempDate.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    } catch (e) {
+      return dateStr;
+    }
+  };
+
+  const [cloneSrcDate, setCloneSrcDate] = useState('2026-05-23');
+  const [cloneDestDate, setCloneDestDate] = useState('2026-05-24');
+
+  // Sync cloneDestDate and cloneSrcDate with selectedDate when active date changes
+  useEffect(() => {
+    setCloneDestDate(selectedDate);
+    setCloneSrcDate(getYesterday(selectedDate));
+  }, [selectedDate]);
   
   // Selected tab: 'all' is Consolidated Kitchen Summary, others are shopIds
   const [selectedShopId, setSelectedShopId] = useState<string>('all');
@@ -200,6 +228,7 @@ export default function DailyProduction({
   // High-performance nested allotment structure
   // Key 1: Shop ID, Values: Array of individual allotment rows
   const [allotments, setAllotments] = useState<Record<string, AllotmentRow[]>>({});
+  const clonedDataRef = useRef<{ date: string; allotments: Record<string, AllotmentRow[]> } | null>(null);
   
   // Bulk shortcuts configurations
   const [bulkTrayWeight, setBulkTrayWeight] = useState('0.688');
@@ -208,40 +237,110 @@ export default function DailyProduction({
   // Alert flags
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [isCloningLoading, setIsCloningLoading] = useState(false);
   
-  // Synchronize state from dispatches on date change
-  useEffect(() => {
-    const initialAllotments: Record<string, AllotmentRow[]> = {};
+  // Helper to generate the complete predefined worksheet item list for a shop
+  const getPredefinedAllotmentsForShop = (shopId: string, copyFromDispatches?: TripEntry[]): AllotmentRow[] => {
+    const shopObj = shops.find(s => s.id === shopId);
+    if (!shopObj) return [];
     
-    // 1. Initialise all shops with empty structures
-    shops.forEach(sh => {
-      initialAllotments[sh.id] = [];
-    });
+    // Find matching shop name sequence in SHOP_ITEM_SEQUENCES
+    const shopNameKey = Object.keys(SHOP_ITEM_SEQUENCES).find(
+      key => key.toLowerCase().trim() === shopObj.name.toLowerCase().trim()
+    );
+    // FALLBACK: If shop doesn't have a customized sequence, load ALL active items in the sweets catalog!
+    const sequenceNames = shopNameKey ? SHOP_ITEM_SEQUENCES[shopNameKey] : items.filter(itm => itm.active).map(itm => itm.name);
     
-    // 2. Load already recorded dispatches for this date if present
-    const dailyDispatches = dispatches.filter(d => d.date === selectedDate);
-    
-    dailyDispatches.forEach(disp => {
-      // Skip if trip number is missing
-      if (!disp.tripNumber || disp.tripNumber.trim() === '') {
-        return;
+    const rows: AllotmentRow[] = [];
+    const processedItemIds = new Set<string>();
+
+    const shopTrips = copyFromDispatches ? copyFromDispatches.filter(d => d.shopId === shopId) : [];
+
+    // 1. Build row structures for each name in predefined template sequence
+    sequenceNames.forEach((seqName, idx) => {
+      const masterItem = items.find(i => i.name.toLowerCase().trim() === seqName.toLowerCase().trim());
+      if (!masterItem) return;
+
+      // Find if we have a saved value for this item in existing dispatches
+      let foundItm: any = null;
+      let foundTripNum = shopObj.id === 'S_EXCEL_4' ? 'S2' : 'S1'; // D/N - Rajadhani default S2, others S1
+
+      for (const trip of shopTrips) {
+        if (!trip.items) continue;
+        const match = trip.items.find(itm => itm.sweetItemId === masterItem.id);
+        if (match) {
+          foundItm = match;
+          foundTripNum = trip.tripNumber || foundTripNum;
+          break;
+        }
       }
-      const shopAllots = [...(initialAllotments[disp.shopId] || [])];
-      disp.items.forEach((itm, index) => {
-        shopAllots.push({
-          id: `${disp.id}_${itm.sweetItemId}_${index}_${Math.random()}`,
+
+      const defaultTray = '0.688';
+      const defaultWastage = '3';
+      const defaultRate = String(masterItem.sellingRate);
+      const defaultDiscount = String(shopObj.discountPercentage || 0);
+
+      rows.push({
+        id: `${shopId}_${masterItem.id}_seq_${idx}_${Math.random()}`,
+        sweetItemId: masterItem.id,
+        sweetItemName: masterItem.name,
+        grossWeight: foundItm ? String(foundItm.grossWeight !== undefined ? foundItm.grossWeight : '') : '',
+        trayWeight: foundItm ? String(foundItm.trayWeight !== undefined ? foundItm.trayWeight : defaultTray) : defaultTray,
+        wastage: foundItm ? String(foundItm.wastage !== undefined ? foundItm.wastage : defaultWastage) : defaultWastage,
+        rate: foundItm ? String(foundItm.rate !== undefined ? foundItm.rate : defaultRate) : defaultRate,
+        discountPercentage: foundItm ? String(foundItm.discountPercentage !== undefined ? foundItm.discountPercentage : defaultDiscount) : defaultDiscount,
+        tripNumber: foundTripNum,
+        isFromSheet: true
+      });
+
+      processedItemIds.add(masterItem.id);
+    });
+
+    // 2. Also append any extra item records present in the dispatches
+    shopTrips.forEach(trip => {
+      if (!trip.items) return;
+      trip.items.forEach((itm, idx) => {
+        if (processedItemIds.has(itm.sweetItemId)) return;
+
+        const masterItem = items.find(i => i.id === itm.sweetItemId);
+        const defaultRate = masterItem ? String(masterItem.sellingRate) : '';
+        const defaultDiscount = String(shopObj.discountPercentage || 0);
+
+        rows.push({
+          id: `${shopId}_${itm.sweetItemId}_extra_${idx}_${Math.random()}`,
           sweetItemId: itm.sweetItemId,
           sweetItemName: itm.sweetItemName,
-          grossWeight: String(itm.grossWeight || ''),
-          trayWeight: String(itm.trayWeight !== undefined ? itm.trayWeight : ''),
-          wastage: String(itm.wastage !== undefined ? itm.wastage : '0'),
-          rate: String(itm.rate || ''),
-          discountPercentage: String(itm.discountPercentage !== undefined ? itm.discountPercentage : '0'),
-          tripNumber: disp.tripNumber,
+          grossWeight: String(itm.grossWeight !== undefined ? itm.grossWeight : ''),
+          trayWeight: String(itm.trayWeight !== undefined ? itm.trayWeight : '0.688'),
+          wastage: String(itm.wastage !== undefined ? itm.wastage : '3'),
+          rate: String(itm.rate !== undefined ? itm.rate : defaultRate),
+          discountPercentage: String(itm.discountPercentage !== undefined ? itm.discountPercentage : defaultDiscount),
+          tripNumber: trip.tripNumber || (shopObj.id === 'S_EXCEL_4' ? 'S2' : 'S1'),
           isFromSheet: true
         });
+
+        processedItemIds.add(itm.sweetItemId);
       });
-      initialAllotments[disp.shopId] = shopAllots;
+    });
+
+    return rows;
+  };
+
+  // Synchronize state from dispatches on date change
+  useEffect(() => {
+    if (clonedDataRef.current) {
+      if (clonedDataRef.current.date === selectedDate) {
+        // Correctly bypass overwriting with empty DB dispatches since the allotments are cloned in memory!
+        // We explicitly set the allotments state here containing the cloned values to guarantee rendering
+        setAllotments(clonedDataRef.current.allotments);
+        return;
+      }
+    }
+    const initialAllotments: Record<string, AllotmentRow[]> = {};
+    const dailyDispatches = dispatches.filter(d => d.date === selectedDate);
+    
+    shops.forEach(sh => {
+      initialAllotments[sh.id] = getPredefinedAllotmentsForShop(sh.id, dailyDispatches);
     });
     
     setAllotments(initialAllotments);
@@ -252,7 +351,7 @@ export default function DailyProduction({
   const categories = ['All', 'Dry', 'Khoya/Milk', 'Syrup', 'Savory', 'Ghee Special'];
 
   // Helper calculation matching exactly user sheets: 
-  // Net weight = Gross - Tare Tray Weight
+  // Net weight = (Gross - Tare Tray Weight) * (1 - Wastage% / 100)
   const computeNetAndAmount = (
     grossStr: string,
     trayStr: string,
@@ -277,8 +376,14 @@ export default function DailyProduction({
     
     const discount = parseFloat(discPercentStr) || 0;
     
-    const netWeight = Math.max(0, (gross - tray) - wastage);
-    const amount = Number((netWeight * rate * (1 - discount / 100)).toFixed(2));
+    // Net weight = (Gross - Tray Weight) * (1 - Wastage / 100)
+    const netWeight = Math.max(0, (gross - tray) * (1 - wastage / 100));
+    
+    // In Rajadhani, the discount percentage represents the direct billing rate multiplier
+    // (e.g. 25% discount field means they are charged 25% of the rate, equivalent to a 75% discount off the price).
+    // If the discount is 0, they are billed 100% of the price.
+    const billingMultiplier = discount > 0 ? (discount / 100) : 1;
+    const amount = Number((netWeight * rate * billingMultiplier).toFixed(2));
     
     return { netWeight, amount };
   };
@@ -528,53 +633,95 @@ export default function DailyProduction({
     });
   };
 
-  // Duplicate previous day's inputs for ALL registered shops
-  const handleCopyPreviousDayAllotmentsForAllShops = () => {
-    const currentDate = new Date(selectedDate);
-    currentDate.setDate(currentDate.getDate() - 1);
-    const prevDateStr = currentDate.toISOString().slice(0, 10);
-    
-    // Gather all dispatches from previous day
-    const prevDisps = dispatches.filter(d => d.date === prevDateStr);
-    if (!prevDisps || prevDisps.length === 0) {
-      alert(`No preceding allotments found for any outlets on previous date: ${prevDateStr}`);
+  // Clone worksheet entries and saved allotments from cloneSrcDate to cloneDestDate
+  const handleCloneAllotments = () => {
+    if (isCloningLoading) return;
+    if (!cloneSrcDate || !cloneDestDate) {
+      alert("Please select both a valid From Date and To Date.");
       return;
     }
-    
-    const countShops = new Set(prevDisps.map(d => d.shopId)).size;
-    
-    if (window.confirm(`Copy yesterday's (${prevDateStr}) worksheets for ALL ${countShops} active outlets? This will replace active rows for ALL shops.`)) {
-      setAllotments(prev => {
-        const newAllots: Record<string, AllotmentRow[]> = {};
-        
-        shops.forEach(sh => {
-          newAllots[sh.id] = [];
-        });
 
-        prevDisps.forEach(disp => {
-          const shopAllots: AllotmentRow[] = [];
-          
-          disp.items.forEach((itm, idx) => {
-            shopAllots.push({
-              id: `${disp.id}_${itm.sweetItemId}_${idx}_${Math.random()}`,
-              sweetItemId: itm.sweetItemId,
-              sweetItemName: itm.sweetItemName,
-              grossWeight: String(itm.grossWeight ?? ''),
-              trayWeight: String(itm.trayWeight ?? ''),
-              wastage: String(itm.wastage !== undefined ? itm.wastage : '0'),
-              rate: String(itm.rate ?? ''),
-              discountPercentage: String(itm.discountPercentage !== undefined ? itm.discountPercentage : '0'),
-              tripNumber: disp.tripNumber,
-              isFromSheet: true
-            });
-          });
-          
-          newAllots[disp.shopId] = shopAllots;
-        });
-        
-        return newAllots;
+    if (cloneSrcDate === cloneDestDate) {
+      alert("From Date and To Date cannot be identical. Please choose a different target date.");
+      return;
+    }
+
+    let newAllots: Record<string, AllotmentRow[]> = {};
+    const isSrcActiveEditor = cloneSrcDate === selectedDate;
+
+    if (isSrcActiveEditor) {
+      // 1. Check if there is active data entered in memory allotments first
+      let hasAnyEnteredData = false;
+      shops.forEach(sh => {
+        const shopAllots = allotments[sh.id] || [];
+        if (shopAllots.some(row => row.grossWeight && row.grossWeight.trim() !== '')) {
+          hasAnyEnteredData = true;
+        }
       });
-      alert(`Successfully duplicated yesterday's worksheets for ALL ${countShops} outlets! Select any shop in the list to customize.`);
+
+      if (hasAnyEnteredData) {
+        // Clone directly from active allotments memory, keeping the values but regenerating unique row IDs
+        shops.forEach(sh => {
+          const activeRows = allotments[sh.id] || [];
+          newAllots[sh.id] = activeRows.map((row, idx) => ({
+            ...row,
+            id: `${sh.id}_${row.sweetItemId}_cloned_${idx}_${Math.random()}`
+          }));
+        });
+      } else {
+        // Current active editor is empty, fall back to checking dispatches database
+        const srcDispatches = dispatches.filter(d => d.date === cloneSrcDate);
+        if (srcDispatches.length === 0) {
+          alert(`No active entered weights on screen or saved dispatches were found for the source date: ${cloneSrcDate}.\n\nPlease ensure you have entered or saved data before cloning.`);
+          return;
+        }
+        shops.forEach(sh => {
+          newAllots[sh.id] = getPredefinedAllotmentsForShop(sh.id, srcDispatches);
+        });
+      }
+    } else {
+      // 2. Clone from database for historical cloneSrcDate
+      const srcDispatches = dispatches.filter(d => d.date === cloneSrcDate);
+
+      if (srcDispatches.length === 0) {
+        alert(`No saved dispatches or allotments were found in the database for the source date: ${cloneSrcDate}.\n\nPlease ensure you have saved allotments/dispatches on that day before cloning.`);
+        return;
+      }
+
+      shops.forEach(sh => {
+        newAllots[sh.id] = getPredefinedAllotmentsForShop(sh.id, srcDispatches);
+      });
+    }
+
+    const countShops = shops.length;
+    const confirmMessage = `Are you sure you want to clone ALL worksheet allotments from ${cloneSrcDate} to ${cloneDestDate} for all ${countShops} shops?\n\nThis will copy all exact values (gross weight, tare, wastage, rates, discounts) into your active editor under target date ${cloneDestDate}.\n\nNote: You will need to click the "Save All Sheets" button to permanently save these cloned sheets under the new date.`;
+
+    if (window.confirm(confirmMessage)) {
+      setIsCloningLoading(true);
+
+      // Simulating a minor load delay so the user clearly registers the operation running and succeeding
+      setTimeout(() => {
+        // Save to ref first to lock the cloned data from being overwritten by the useEffect date sync
+        clonedDataRef.current = {
+          date: cloneDestDate,
+          allotments: newAllots
+        };
+
+        setAllotments(newAllots);
+
+        // Switch active Selected Date to the cloned destination date
+        setSelectedDate(cloneDestDate);
+
+        // Reset shop view to 'all' to show the fresh overall metrics first
+        setSelectedShopId('all');
+
+        setIsCloningLoading(false);
+
+        // Defer alert so React render cycles can complete and show the interface transition
+        setTimeout(() => {
+          alert(`Successfully loaded cloned worksheets from ${cloneSrcDate} into active editor for ${cloneDestDate}!\n\nYou can now tweak allotments or click "Save All Sheets" directly to save them to ${cloneDestDate}.`);
+        }, 100);
+      }, 800);
     }
   };
 
@@ -753,6 +900,7 @@ export default function DailyProduction({
       }
     }
 
+    clonedDataRef.current = null;
     setSaveSuccess(true);
     setValidationErrors([]);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -781,15 +929,6 @@ export default function DailyProduction({
         {/* ACTION BUTTON & DATE SELECTOR */}
         <div className="flex flex-wrap items-center gap-3 self-start md:self-auto">
           <button
-            type="button"
-            onClick={handleCopyPreviousDayAllotmentsForAllShops}
-            className="px-4 py-2.5 bg-white hover:bg-blue-50 text-blue-600 border border-blue-200 hover:border-blue-300 active:scale-95 font-semibold text-xs rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 shrink-0"
-          >
-            <Copy className="w-4 h-4 text-blue-500" />
-            <span>Dup Yesterday's Allotments (All Shops)</span>
-          </button>
-
-          <button
             onClick={handleSaveAllAllotments}
             className="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 active:scale-95 text-slate-950 font-bold text-xs rounded-xl shadow-md hover:shadow-amber-500/15 transition-all flex items-center justify-center gap-1.5 font-sans tracking-wide shrink-0"
           >
@@ -803,10 +942,66 @@ export default function DailyProduction({
             <input
               type="date"
               value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
+              onChange={(e) => {
+                clonedDataRef.current = null;
+                setSelectedDate(e.target.value);
+              }}
               className="bg-slate-950 border border-slate-850 px-3 py-1 rounded text-sm text-amber-500 font-mono font-bold focus:outline-none"
             />
           </div>
+        </div>
+      </div>
+
+      {/* CLONE ALLOTMENTS BAR */}
+      <div className="bg-slate-900/60 border border-slate-800 p-4 rounded-2xl flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-blue-500/10 rounded-xl text-blue-400 shrink-0 border border-blue-500/10">
+            <Copy className="w-4 h-4" />
+          </div>
+          <div>
+            <h3 className="text-xs font-bold text-slate-200 tracking-wide uppercase">Clone Production Sheets</h3>
+            <p className="text-[11px] text-slate-400">
+              Duplicate complete sequence of quantities, prices and discounts from search date to target date.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3 bg-slate-950/80 p-2 rounded-xl border border-slate-800/60 grow lg:grow-0 justify-between lg:justify-start">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider font-mono pl-1 font-sans">From:</span>
+            <input
+              type="date"
+              value={cloneSrcDate}
+              onChange={(e) => setCloneSrcDate(e.target.value)}
+              className="bg-slate-900 border border-slate-800/80 px-2.5 py-1 rounded text-xs text-blue-400 font-mono font-bold focus:outline-none focus:border-blue-500/55 transition-colors"
+            />
+          </div>
+
+          <div className="text-slate-600 select-none hidden sm:block">➔</div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider font-mono font-sans">To:</span>
+            <input
+              type="date"
+              value={cloneDestDate}
+              onChange={(e) => setCloneDestDate(e.target.value)}
+              className="bg-slate-900 border border-slate-800/80 px-2.5 py-1 rounded text-xs text-emerald-400 font-mono font-bold focus:outline-none focus:border-emerald-500/55 transition-colors"
+            />
+          </div>
+
+          <button
+            type="button"
+            onClick={handleCloneAllotments}
+            disabled={isCloningLoading}
+            className={`px-4 py-1.5 bg-blue-600 hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/10 active:scale-95 text-white font-bold text-xs rounded-lg transition-all flex items-center justify-center gap-1.5 shrink-0 ${isCloningLoading ? 'opacity-75 cursor-not-allowed' : ''}`}
+          >
+            {isCloningLoading ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-200" />
+            ) : (
+              <Copy className="w-3.5 h-3.5 text-blue-100" />
+            )}
+            <span>{isCloningLoading ? 'Cloning...' : 'Clone & Edit'}</span>
+          </button>
         </div>
       </div>
 
@@ -1475,7 +1670,8 @@ export default function DailyProduction({
                               const disc = parseFloat(newDiscountPercentage) || 0;
                               if (gross > 0) {
                                 const net = Math.max(0, (gross - tray) * (1 - waste / 100));
-                                const amt = net * rate * (1 - disc / 100);
+                                const billingMultiplier = disc > 0 ? (disc / 100) : 1;
+                                const amt = net * rate * billingMultiplier;
                                 return (
                                   <span className="font-mono font-bold text-emerald-400 text-xs truncate max-w-[80px]">
                                     ₹ {amt.toFixed(1)}

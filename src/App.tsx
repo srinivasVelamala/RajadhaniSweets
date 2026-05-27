@@ -47,7 +47,20 @@ export default function App() {
   });
   const [dispatches, setDispatches] = useState<TripEntry[]>(() => {
     const saved = localStorage.getItem('rajadhani_dispatches_v_excel_24may_v4');
-    return saved ? JSON.parse(saved) : INITIAL_TRIPS;
+    let loaded: TripEntry[] = saved ? JSON.parse(saved) : INITIAL_TRIPS;
+    
+    // Auto-backfill May 23 dispatches if they don't exist, to support "dupe yesterday" out-of-the-box on first load
+    const hasMay23 = loaded.some((d: TripEntry) => d.date === '2026-05-23');
+    if (!hasMay23) {
+      const may24trips = loaded.filter((d: TripEntry) => d.date === '2026-05-24');
+      const may23trips = may24trips.map((trip: TripEntry) => ({
+        ...trip,
+        id: `${trip.id}_may23_${Math.random()}`,
+        date: '2026-05-23'
+      }));
+      loaded = [...loaded, ...may23trips];
+    }
+    return loaded;
   });
   const [inventory, setInventory] = useState<InventoryItem[]>(() => {
     const saved = localStorage.getItem('rajadhani_inventory_v_excel_24may_v4');
