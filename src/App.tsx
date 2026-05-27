@@ -195,6 +195,57 @@ export default function App() {
     setDispatches(dispatches.map(d => d.id === updated.id ? updated : d));
   };
 
+  const handleSaveDailyProductionData = (
+    date: string,
+    allDateTrips: TripEntry[],
+    productionEntries: Omit<ProductionEntry, 'id'>[]
+  ) => {
+    // 1. Calculate the outstanding balance differences for each shop
+    const oldDateDispatches = dispatches.filter(d => d.date === date);
+    const balanceMap: Record<string, number> = {};
+
+    // Subtract old total amounts
+    oldDateDispatches.forEach(d => {
+      balanceMap[d.shopId] = (balanceMap[d.shopId] || 0) - d.totalAmount;
+    });
+
+    // Add new total amounts
+    allDateTrips.forEach(d => {
+      balanceMap[d.shopId] = (balanceMap[d.shopId] || 0) + d.totalAmount;
+    });
+
+    // 2. Update shops outstandingBalance
+    setShops(prevShops =>
+      prevShops.map(sh => {
+        const diff = balanceMap[sh.id] || 0;
+        if (diff !== 0) {
+          const newBal = Math.max(0, sh.outstandingBalance + diff);
+          return {
+            ...sh,
+            outstandingBalance: Number(newBal.toFixed(2))
+          };
+        }
+        return sh;
+      })
+    );
+
+    // 3. Update dispatches: filter out this date and add the new trips
+    setDispatches(prevDispatches => {
+      const distinctOtherTrips = prevDispatches.filter(d => d.date !== date);
+      return [...allDateTrips, ...distinctOtherTrips];
+    });
+
+    // 4. Update production ledger
+    setProduction(prevProduction => {
+      const otherLedger = prevProduction.filter(p => p.date !== date);
+      const withIds = productionEntries.map((pe, idx) => ({
+        ...pe,
+        id: `PR-${date}-${Date.now()}-${idx}-${Math.random()}`
+      }));
+      return [...withIds, ...otherLedger];
+    });
+  };
+
   // Inventory adjustment
   const handleUpdateInventory = (updated: InventoryItem) => {
     setInventory(inventory.map(inv => inv.id === updated.id ? updated : inv));
@@ -226,17 +277,37 @@ export default function App() {
 
   // Legacy Excel Sheet import reconciliations
   const handleExcelImportCompleted = (importedShops: Shop[], importedItems: SweetItem[], importedDispatches: TripEntry[]) => {
-    // Merge without duplication based on names
+    // Merge and update without duplication based on names
     const mergedShops = [...shops];
     importedShops.forEach(nSh => {
-      if (!mergedShops.some(s => s.name.toLowerCase() === nSh.name.toLowerCase())) {
+      const existingIdx = mergedShops.findIndex(s => s.name.toLowerCase() === nSh.name.toLowerCase());
+      if (existingIdx >= 0) {
+        mergedShops[existingIdx] = {
+          ...mergedShops[existingIdx],
+          owner: nSh.owner || mergedShops[existingIdx].owner,
+          mobile: nSh.mobile || mergedShops[existingIdx].mobile,
+          address: nSh.address || mergedShops[existingIdx].address,
+          discountPercentage: nSh.discountPercentage !== undefined ? nSh.discountPercentage : mergedShops[existingIdx].discountPercentage,
+          creditDays: nSh.creditDays || mergedShops[existingIdx].creditDays,
+          outstandingBalance: nSh.outstandingBalance !== 0 ? nSh.outstandingBalance : mergedShops[existingIdx].outstandingBalance,
+        };
+      } else {
         mergedShops.push(nSh);
       }
     });
 
     const mergedItems = [...items];
     importedItems.forEach(nIt => {
-      if (!mergedItems.some(i => i.name.toLowerCase() === nIt.name.toLowerCase())) {
+      const existingIdx = mergedItems.findIndex(i => i.name.toLowerCase() === nIt.name.toLowerCase());
+      if (existingIdx >= 0) {
+        mergedItems[existingIdx] = {
+          ...mergedItems[existingIdx],
+          sellingRate: nIt.sellingRate || mergedItems[existingIdx].sellingRate,
+          productionCost: nIt.productionCost || mergedItems[existingIdx].productionCost,
+          category: nIt.category || mergedItems[existingIdx].category,
+          unit: nIt.unit || mergedItems[existingIdx].unit,
+        };
+      } else {
         mergedItems.push(nIt);
       }
     });
@@ -405,6 +476,7 @@ export default function App() {
               onSaveBulkProduction={handleSaveBulkProduction}
               onAddDispatch={handleAddDispatch}
               onUpdateDispatch={handleUpdateDispatch}
+              onSaveDailyProductionData={handleSaveDailyProductionData}
               userRole={userRole}
             />
           )}

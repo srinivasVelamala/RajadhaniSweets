@@ -147,6 +147,11 @@ interface DailyProductionProps {
   onSaveBulkProduction?: (date: string, entries: Omit<ProductionEntry, 'id'>[]) => void;
   onAddDispatch: (entry: Omit<TripEntry, 'id'>) => void;
   onUpdateDispatch: (entry: TripEntry) => void;
+  onSaveDailyProductionData?: (
+    date: string,
+    allDateTrips: TripEntry[],
+    productionEntries: Omit<ProductionEntry, 'id'>[]
+  ) => void;
   userRole: 'Admin' | 'Operator';
 }
 
@@ -159,6 +164,7 @@ export default function DailyProduction({
   onSaveBulkProduction,
   onAddDispatch,
   onUpdateDispatch,
+  onSaveDailyProductionData,
   userRole
 }: DailyProductionProps) {
   const [selectedDate, setSelectedDate] = useState('2026-05-24');
@@ -246,21 +252,32 @@ export default function DailyProduction({
   const categories = ['All', 'Dry', 'Khoya/Milk', 'Syrup', 'Savory', 'Ghee Special'];
 
   // Helper calculation matching exactly user sheets: 
-  // Net weight = (Gross - Tare Tray Weight) reduced by wastage % percentage
+  // Net weight = Gross - Tare Tray Weight
   const computeNetAndAmount = (
     grossStr: string,
     trayStr: string,
     wastageStr: string,
     rateStr: string,
-    discPercentStr: string
+    discPercentStr: string,
+    itemId?: string
   ) => {
     const gross = parseFloat(grossStr) || 0;
     const tray = parseFloat(trayStr) || 0;
     const wastage = parseFloat(wastageStr) || 0;
-    const rate = parseFloat(rateStr) || 0;
+    
+    let rate = parseFloat(rateStr);
+    if (isNaN(rate) || rate === 0) {
+      if (itemId) {
+        const masterItem = items.find(i => i.id === itemId);
+        rate = masterItem ? masterItem.sellingRate : 0;
+      } else {
+        rate = 0;
+      }
+    }
+    
     const discount = parseFloat(discPercentStr) || 0;
     
-    const netWeight = Math.max(0, (gross - tray) * (1 - wastage / 100));
+    const netWeight = Math.max(0, (gross - tray) - wastage);
     const amount = Number((netWeight * rate * (1 - discount / 100)).toFixed(2));
     
     return { netWeight, amount };
@@ -366,7 +383,8 @@ export default function DailyProduction({
           allot.trayWeight,
           allot.wastage,
           allot.rate,
-          allot.discountPercentage
+          allot.discountPercentage,
+          allot.sweetItemId
         );
         
         if (netWeight > 0) {
@@ -374,7 +392,8 @@ export default function DailyProduction({
           totalAmount += amount;
           itemsCount += 1;
           
-          const rateVal = parseFloat(allot.rate) || 0;
+          const masterItem = items.find(i => i.id === allot.sweetItemId);
+          const rateVal = parseFloat(allot.rate) || (masterItem ? masterItem.sellingRate : 0);
           const rawTotal = netWeight * rateVal;
           const disc = Math.max(0, rawTotal - amount);
           totalDiscountVal += disc;
@@ -409,7 +428,8 @@ export default function DailyProduction({
             allot.trayWeight,
             allot.wastage,
             allot.rate,
-            allot.discountPercentage
+            allot.discountPercentage,
+            allot.sweetItemId
           );
           
           if (netWeight > 0) {
@@ -618,6 +638,7 @@ export default function DailyProduction({
 
     // 2. Perform updates to Dispatches database, grouping allotment rows by tripNumber
     const existingDateDispatches = dispatches.filter(d => d.date === selectedDate);
+    const compiledDateTrips: TripEntry[] = [];
     
     shops.forEach(sh => {
       const shopAllots = allotments[sh.id] || [];
@@ -651,7 +672,8 @@ export default function DailyProduction({
             row.trayWeight,
             row.wastage,
             row.rate,
-            row.discountPercentage
+            row.discountPercentage,
+            row.sweetItemId
           );
           
           return {
@@ -671,13 +693,14 @@ export default function DailyProduction({
         const matchedTrip = existingShopTrips.find(t => t.tripNumber.toUpperCase().trim() === tNum.toUpperCase().trim());
         
         if (matchedTrip) {
-          onUpdateDispatch({
+          compiledDateTrips.push({
             ...matchedTrip,
             items: tripItems,
             totalAmount
           });
         } else {
-          onAddDispatch({
+          compiledDateTrips.push({
+            id: `TR-${Date.now()}-${sh.id}-${tNum}-${Math.random()}`,
             tripNumber: tNum,
             shopId: sh.id,
             shopName: sh.name,
@@ -689,11 +712,11 @@ export default function DailyProduction({
         }
       });
       
-      // Clear old trips that no longer have any active rows
+      // Clear old trips or convert them to empty if no active rows exist anymore
       existingShopTrips.forEach(oldTrip => {
         const tNumUpper = oldTrip.tripNumber.toUpperCase().trim();
         if (!activeRowsByTrip[tNumUpper]) {
-          onUpdateDispatch({
+          compiledDateTrips.push({
             ...oldTrip,
             items: [],
             totalAmount: 0,
@@ -722,8 +745,12 @@ export default function DailyProduction({
       });
     });
 
-    if (onSaveBulkProduction) {
-      onSaveBulkProduction(selectedDate, productionEntriesToSave);
+    if (onSaveDailyProductionData) {
+      onSaveDailyProductionData(selectedDate, compiledDateTrips, productionEntriesToSave);
+    } else {
+      if (onSaveBulkProduction) {
+        onSaveBulkProduction(selectedDate, productionEntriesToSave);
+      }
     }
 
     setSaveSuccess(true);
@@ -896,11 +923,11 @@ export default function DailyProduction({
                           {totalNet.toFixed(1)} Kg
                         </span>
                         <span className="text-[9px] text-slate-600 font-bold block">
-                          ₹{Math.round(totalAmount).toLocaleString()}
+                          ₹{totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </span>
                         {totalDiscountVal > 0 && (
                           <span className="text-[8px] text-rare-red text-rose-600 block" title="Total Discount Amount">
-                            -₹{Math.round(totalDiscountVal).toLocaleString()}
+                            -₹{totalDiscountVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </span>
                         )}
                       </div>
@@ -1055,13 +1082,13 @@ export default function DailyProduction({
                     <div className="space-y-0.5 border-r border-slate-100 pr-2 md:pl-2">
                       <span className="text-[10px] text-rose-500 font-bold uppercase tracking-wider block">Discount Given</span>
                       <span className="text-base font-bold text-rose-600 font-mono">
-                        ₹ {Math.round(totalDiscountVal).toLocaleString()}
+                        ₹ {totalDiscountVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
                     <div className="space-y-0.5 md:pl-2">
                       <span className="text-[10px] text-emerald-500 font-bold uppercase tracking-wider block">Bill Total (Post-Disc)</span>
                       <span className="text-base font-bold text-emerald-600 font-mono">
-                        ₹ {Math.round(totalAmount).toLocaleString()}
+                        ₹ {totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
                   </div>
@@ -1169,28 +1196,33 @@ export default function DailyProduction({
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-805/45 text-xs">
-                      {sortedAndFilteredItems.length === 0 ? (
+                      {filteredAllotments.length === 0 ? (
                         <tr>
-                          <td colSpan={8} className="py-10 text-center text-slate-500">
+                          <td colSpan={8} className="py-10 text-center text-slate-500 font-medium">
                             No dispatch items are currently added for this shop. Select a sweet below to begin.
                           </td>
                         </tr>
                       ) : (
-                        sortedAndFilteredItems.map(item => {
-                          const v = getAllotmentValues(selectedShopId, item);
+                        filteredAllotments.map(allot => {
+                          const item = items.find(i => i.id === allot.sweetItemId);
+                          const unit = item ? item.unit : 'Kg';
+                          const category = item ? item.category : 'Special';
+                          
                           const { netWeight, amount } = computeNetAndAmount(
-                            v.grossWeight,
-                            v.trayWeight,
-                            v.wastage,
-                            v.rate,
-                            v.discountPercentage
+                            allot.grossWeight,
+                            allot.trayWeight,
+                            allot.wastage,
+                            allot.rate,
+                            allot.discountPercentage,
+                            allot.sweetItemId
                           );
-                          const hasGrossValue = v.grossWeight !== '' && parseFloat(v.grossWeight) > 0;
-                          const isFromSheet = isSheetItem(item);
+                          const hasGrossValue = allot.grossWeight !== '' && parseFloat(allot.grossWeight) > 0;
+                          const isFromSheet = !!allot.isFromSheet;
+                          const tripSuffix = allot.tripNumber ? ` (${allot.tripNumber})` : '';
                           
                           return (
                             <tr 
-                              key={item.id} 
+                              key={allot.id} 
                               className={`hover:bg-slate-850/30 transition-colors ${
                                 hasGrossValue ? 'bg-amber-950/10' : ''
                               }`}
@@ -1200,8 +1232,8 @@ export default function DailyProduction({
                               <td className="py-2 px-3">
                                 <div className="flex items-center justify-between gap-2.5">
                                   <div className="flex flex-col min-w-0">
-                                    <span className="font-bold text-slate-150 text-xs block truncate" title={item.name}>{item.name}</span>
-                                    <span className="text-[9px] font-mono font-semibold text-slate-500">{item.category} Type</span>
+                                    <span className="font-bold text-slate-150 text-xs block truncate" title={allot.sweetItemName}>{allot.sweetItemName}</span>
+                                    <span className="text-[9px] font-mono font-semibold text-slate-500">{category} Type{tripSuffix}</span>
                                   </div>
                                   <div className="flex items-center gap-1.5 shrink-0">
                                     {isFromSheet && (
@@ -1211,7 +1243,7 @@ export default function DailyProduction({
                                     )}
                                     <button
                                       type="button"
-                                      onClick={() => handleRemoveAllotmentRow(item.id)}
+                                      onClick={() => handleRemoveAllotmentRow(allot.id)}
                                       className="p-1 hover:bg-slate-800 rounded text-slate-500 hover:text-rose-400 transition-colors"
                                       title="Remove from dispatch checklist"
                                     >
@@ -1229,8 +1261,8 @@ export default function DailyProduction({
                                     min="0"
                                     step="any"
                                     placeholder="0"
-                                    value={v.grossWeight}
-                                    onChange={(e) => handleAllotmentChange(selectedShopId, item.id, 'grossWeight', e.target.value)}
+                                    value={allot.grossWeight}
+                                    onChange={(e) => handleAllotmentChange(selectedShopId, allot.id, 'grossWeight', e.target.value)}
                                     className={`w-full text-center px-1.5 py-1 bg-slate-950 border text-xs font-bold text-white rounded focus:outline-none focus:border-amber-500 font-mono ${
                                       hasGrossValue ? 'border-amber-500/50' : 'border-slate-800'
                                     }`}
@@ -1245,21 +1277,21 @@ export default function DailyProduction({
                                   min="0"
                                   step="any"
                                   placeholder="Tare"
-                                  value={v.trayWeight}
-                                  onChange={(e) => handleAllotmentChange(selectedShopId, item.id, 'trayWeight', e.target.value)}
+                                  value={allot.trayWeight}
+                                  onChange={(e) => handleAllotmentChange(selectedShopId, allot.id, 'trayWeight', e.target.value)}
                                   className="w-full text-center px-1.5 py-1 bg-slate-950 border border-slate-800 text-xs font-semibold text-slate-400 rounded focus:outline-none font-mono"
                                 />
                               </td>
 
                               {/* Wastage */}
-                              <td className="py-2 px-3 bg-slate-900/10">
+                              <td className="py-2 px-3 bg-slate-905/30 bg-slate-900/10">
                                 <input
                                   type="number"
                                   min="0"
                                   max="100"
                                   placeholder="%"
-                                  value={v.wastage}
-                                  onChange={(e) => handleAllotmentChange(selectedShopId, item.id, 'wastage', e.target.value)}
+                                  value={allot.wastage}
+                                  onChange={(e) => handleAllotmentChange(selectedShopId, allot.id, 'wastage', e.target.value)}
                                   className="w-full text-center px-1.5 py-1 bg-slate-950 border border-slate-800 text-xs text-slate-400 rounded focus:outline-none font-mono"
                                 />
                               </td>
@@ -1268,7 +1300,7 @@ export default function DailyProduction({
                               <td className="py-2 px-3 bg-amber-500/5 border-l border-r border-slate-850/80 text-center font-mono font-bold select-none">
                                 {netWeight > 0 ? (
                                   <span className="text-amber-500 text-sm">
-                                    {netWeight.toFixed(2)} <span className="text-[9px] text-slate-600 uppercase inline">{item.unit}</span>
+                                    {netWeight.toFixed(2)} <span className="text-[9px] text-slate-600 uppercase inline">{unit}</span>
                                   </span>
                                 ) : (
                                   <span className="text-slate-700">-</span>
@@ -1282,8 +1314,8 @@ export default function DailyProduction({
                                   <input
                                     type="number"
                                     min="0"
-                                    value={v.rate}
-                                    onChange={(e) => handleAllotmentChange(selectedShopId, item.id, 'rate', e.target.value)}
+                                    value={allot.rate !== undefined && allot.rate !== '' ? allot.rate : (item ? String(item.sellingRate) : '')}
+                                    onChange={(e) => handleAllotmentChange(selectedShopId, allot.id, 'rate', e.target.value)}
                                     className="w-full text-right pr-1.5 pl-4 py-1 bg-slate-950 border border-slate-800 text-xs text-slate-350 rounded focus:outline-none font-mono"
                                   />
                                 </div>
@@ -1295,8 +1327,8 @@ export default function DailyProduction({
                                   type="number"
                                   min="0"
                                   max="100"
-                                  value={v.discountPercentage}
-                                  onChange={(e) => handleAllotmentChange(selectedShopId, item.id, 'discountPercentage', e.target.value)}
+                                  value={allot.discountPercentage !== undefined && allot.discountPercentage !== '' ? allot.discountPercentage : String(shops.find(s => s.id === selectedShopId)?.discountPercentage || 0)}
+                                  onChange={(e) => handleAllotmentChange(selectedShopId, allot.id, 'discountPercentage', e.target.value)}
                                   className="w-full text-center px-1 py-1 bg-slate-950 border border-slate-800 text-xs text-slate-300 rounded focus:outline-none font-mono"
                                 />
                               </td>
@@ -1332,7 +1364,7 @@ export default function DailyProduction({
                             >
                               <option value="" className="text-slate-500">-- Choose Sweets to Add --</option>
                               {items
-                                .filter(itm => itm.active && !allotments[selectedShopId]?.[itm.id])
+                                .filter(itm => itm.active && !(allotments[selectedShopId] || []).some(row => row.sweetItemId === itm.id))
                                 .sort((a, b) => a.name.localeCompare(b.name))
                                 .map(itm => (
                                   <option key={itm.id} value={itm.id} className="text-slate-200 bg-slate-950">
@@ -1496,23 +1528,13 @@ export default function DailyProduction({
           )}
 
           {/* MASTER ACTIONS PANEL (VISIBLE AT VERY BOTTOM ON SINGLE SCREEN ENTRY) */}
-          <div className="bg-slate-950/80 border border-slate-800 p-6 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg backdrop-blur-md">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 bg-amber-500/10 rounded-lg shrink-0">
-                <Info className="w-5 h-5 text-amber-500" />
-              </div>
-              <p className="text-xs text-slate-400 max-w-lg m-0 leading-normal">
-                <strong>Attention:</strong> Click the button to the right to save all changed shop worksheets. The system automatically recalculates outstanding balances, updates dispatch maps (Trips), and saves matching kitchen cooking batches.
-              </p>
+          <div className="bg-slate-950/80 border border-slate-800 p-6 rounded-xl flex items-center gap-3 shadow-lg backdrop-blur-md">
+            <div className="p-2.5 bg-amber-500/10 rounded-lg shrink-0">
+              <Info className="w-5 h-5 text-amber-500" />
             </div>
-
-            <button
-              onClick={handleSaveAllAllotments}
-              className="w-full sm:w-auto px-8 py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-sm rounded-xl shadow-md hover:shadow-amber-500/20 transition-all flex items-center justify-center gap-2 font-sans tracking-wide shrink-0 font-bold"
-            >
-              <Save className="w-5 h-5" />
-              Save All Shopwise Production Sheets
-            </button>
+            <p className="text-xs text-slate-400 max-w-2xl m-0 leading-normal">
+              <strong>Daily Synchronization:</strong> All shop worksheets automatically consolidate here. Saving your changes synchronizes outstanding ledger balances, active dispatch routes, and kitchen baking batches. Use the primary <strong>Save All Sheets</strong> button in the top menu.
+            </p>
           </div>
 
         </div>
