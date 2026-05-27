@@ -71,7 +71,7 @@ if %ERRORLEVEL% neq 0 (
 )
 echo.
 echo  - Step 2: Booting Express server with live tsx runner...
-echo  - Service local URL: http://localhost:5000
+echo  - Service local URL: http://localhost:3000
 echo  - Please press Ctrl+C inside this window to terminate the application.
 echo.
 color 0A
@@ -104,7 +104,7 @@ if %ERRORLEVEL% neq 0 (
 )
 echo.
 echo  - Step 3: Starting production runtime...
-echo  - Express local ingress point: http://localhost:5000
+echo  - Express local ingress point: http://localhost:3000
 echo  - Please press Ctrl+C inside this window to terminate the application.
 echo.
 color 0A

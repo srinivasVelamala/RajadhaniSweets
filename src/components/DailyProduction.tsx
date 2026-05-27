@@ -238,10 +238,6 @@ export default function DailyProduction({
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [isCloningLoading, setIsCloningLoading] = useState(false);
-  const [cloneError, setCloneError] = useState<string | null>(null);
-  const [cloneSuccess, setCloneSuccess] = useState<string | null>(null);
-  const [pendingCloneData, setPendingCloneData] = useState<{ allots: Record<string, AllotmentRow[]>; srcDate: string; destDate: string } | null>(null);
-  const [showClearConfirm, setShowClearConfirm] = useState(false);
   
   // Helper to generate the complete predefined worksheet item list for a shop
   const getPredefinedAllotmentsForShop = (shopId: string, copyFromDispatches?: TripEntry[]): AllotmentRow[] => {
@@ -338,6 +334,9 @@ export default function DailyProduction({
         // We explicitly set the allotments state here containing the cloned values to guarantee rendering
         setAllotments(clonedDataRef.current.allotments);
         return;
+      } else {
+        // User changed date manually so we can clean historical clone buffers
+        clonedDataRef.current = null;
       }
     }
     const initialAllotments: Record<string, AllotmentRow[]> = {};
@@ -640,16 +639,13 @@ export default function DailyProduction({
   // Clone worksheet entries and saved allotments from cloneSrcDate to cloneDestDate
   const handleCloneAllotments = () => {
     if (isCloningLoading) return;
-    setCloneError(null);
-    setCloneSuccess(null);
-
     if (!cloneSrcDate || !cloneDestDate) {
-      setCloneError("Please select both a valid From Date and To Date.");
+      alert("Please select both a valid From Date and To Date.");
       return;
     }
 
     if (cloneSrcDate === cloneDestDate) {
-      setCloneError("From Date and To Date cannot be identical. Please choose a different target date.");
+      alert("From Date and To Date cannot be identical. Please choose a different target date.");
       return;
     }
 
@@ -657,6 +653,7 @@ export default function DailyProduction({
     const isSrcActiveEditor = cloneSrcDate === selectedDate;
 
     if (isSrcActiveEditor) {
+      // 1. Check if there is active data entered in memory allotments first
       let hasAnyEnteredData = false;
       shops.forEach(sh => {
         const shopAllots = allotments[sh.id] || [];
@@ -666,6 +663,7 @@ export default function DailyProduction({
       });
 
       if (hasAnyEnteredData) {
+        // Clone directly from active allotments memory, keeping the values but regenerating unique row IDs
         shops.forEach(sh => {
           const activeRows = allotments[sh.id] || [];
           newAllots[sh.id] = activeRows.map((row, idx) => ({
@@ -674,9 +672,10 @@ export default function DailyProduction({
           }));
         });
       } else {
+        // Current active editor is empty, fall back to checking dispatches database
         const srcDispatches = dispatches.filter(d => d.date === cloneSrcDate);
         if (srcDispatches.length === 0) {
-          setCloneError(`No active entered weights or saved dispatches found for ${cloneSrcDate}. Please enter or save data before cloning.`);
+          alert(`No active entered weights on screen or saved dispatches were found for the source date: ${cloneSrcDate}.\n\nPlease ensure you have entered or saved data before cloning.`);
           return;
         }
         shops.forEach(sh => {
@@ -684,44 +683,59 @@ export default function DailyProduction({
         });
       }
     } else {
+      // 2. Clone from database for historical cloneSrcDate
       const srcDispatches = dispatches.filter(d => d.date === cloneSrcDate);
+
       if (srcDispatches.length === 0) {
-        setCloneError(`No saved dispatches found for ${cloneSrcDate}. Please save allotments for that date first.`);
+        alert(`No saved dispatches or allotments were found in the database for the source date: ${cloneSrcDate}.\n\nPlease ensure you have saved allotments/dispatches on that day before cloning.`);
         return;
       }
+
       shops.forEach(sh => {
         newAllots[sh.id] = getPredefinedAllotmentsForShop(sh.id, srcDispatches);
       });
     }
 
-    // Show inline confirmation instead of window.confirm
-    setPendingCloneData({ allots: newAllots, srcDate: cloneSrcDate, destDate: cloneDestDate });
-  };
+    const countShops = shops.length;
+    const confirmMessage = `Are you sure you want to clone ALL worksheet allotments from ${cloneSrcDate} to ${cloneDestDate} for all ${countShops} shops?\n\nThis will copy all exact values (gross weight, tare, wastage, rates, discounts) into your active editor under target date ${cloneDestDate}.\n\nNote: You will need to click the "Save All Sheets" button to permanently save these cloned sheets under the new date.`;
 
-  const handleConfirmClone = () => {
-    if (!pendingCloneData) return;
-    const { allots, srcDate, destDate } = pendingCloneData;
-    setPendingCloneData(null);
-    setIsCloningLoading(true);
+    if (window.confirm(confirmMessage)) {
+      setIsCloningLoading(true);
 
-    setTimeout(() => {
-      clonedDataRef.current = { date: destDate, allotments: allots };
-      setAllotments(allots);
-      setSelectedDate(destDate);
-      setSelectedShopId('all');
-      setIsCloningLoading(false);
-      setCloneSuccess(`Worksheets cloned from ${srcDate} → ${destDate} for ${shops.length} shops. Review entries then click "Save All Sheets" to save.`);
-    }, 800);
+      // Simulating a minor load delay so the user clearly registers the operation running and succeeding
+      setTimeout(() => {
+        // Save to ref first to lock the cloned data from being overwritten by the useEffect date sync
+        clonedDataRef.current = {
+          date: cloneDestDate,
+          allotments: newAllots
+        };
+
+        setAllotments(newAllots);
+
+        // Switch active Selected Date to the cloned destination date
+        setSelectedDate(cloneDestDate);
+
+        // Reset shop view to 'all' to show the fresh overall metrics first
+        setSelectedShopId('all');
+
+        setIsCloningLoading(false);
+
+        // Defer alert so React render cycles can complete and show the interface transition
+        setTimeout(() => {
+          alert(`Successfully loaded cloned worksheets from ${cloneSrcDate} into active editor for ${cloneDestDate}!\n\nYou can now tweak allotments or click "Save All Sheets" directly to save them to ${cloneDestDate}.`);
+        }, 100);
+      }, 800);
+    }
   };
 
   const handleClearShopSheet = () => {
     if (selectedShopId === 'all') return;
-    setShowClearConfirm(true);
-  };
-
-  const handleConfirmClear = () => {
-    setShowClearConfirm(false);
-    setAllotments(prev => ({ ...prev, [selectedShopId]: [] }));
+    if (window.confirm("Are you sure you want to clear this shop's active grid entry rows? This won't save until you click Save Daily Production.")) {
+      setAllotments(prev => ({
+        ...prev,
+        [selectedShopId]: []
+      }));
+    }
   };
 
   // Global save synchronized ledger
@@ -931,10 +945,7 @@ export default function DailyProduction({
             <input
               type="date"
               value={selectedDate}
-              onChange={(e) => {
-                clonedDataRef.current = null;
-                setSelectedDate(e.target.value);
-              }}
+              onChange={(e) => setSelectedDate(e.target.value)}
               className="bg-slate-950 border border-slate-850 px-3 py-1 rounded text-sm text-amber-500 font-mono font-bold focus:outline-none"
             />
           </div>
@@ -942,103 +953,56 @@ export default function DailyProduction({
       </div>
 
       {/* CLONE ALLOTMENTS BAR */}
-      <div className="bg-slate-900/60 border border-slate-800 p-4 rounded-2xl flex flex-col gap-3 shadow-sm">
-        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-500/10 rounded-xl text-blue-400 shrink-0 border border-blue-500/10">
-              <Copy className="w-4 h-4" />
-            </div>
-            <div>
-              <h3 className="text-xs font-bold text-slate-200 tracking-wide uppercase">Clone Production Sheets</h3>
-              <p className="text-[11px] text-slate-400">
-                Duplicate complete sequence of quantities, prices and discounts from source date to target date.
-              </p>
-            </div>
+      <div className="bg-slate-900/60 border border-slate-800 p-4 rounded-2xl flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-blue-500/10 rounded-xl text-blue-400 shrink-0 border border-blue-500/10">
+            <Copy className="w-4 h-4" />
           </div>
-
-          <div className="flex flex-wrap items-center gap-3 bg-slate-950/80 p-2 rounded-xl border border-slate-800/60 grow lg:grow-0 justify-between lg:justify-start">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider font-mono pl-1 font-sans">From:</span>
-              <input
-                type="date"
-                value={cloneSrcDate}
-                onChange={(e) => { setCloneSrcDate(e.target.value); setCloneError(null); setPendingCloneData(null); }}
-                className="bg-slate-900 border border-slate-800/80 px-2.5 py-1 rounded text-xs text-blue-400 font-mono font-bold focus:outline-none focus:border-blue-500/55 transition-colors"
-              />
-            </div>
-
-            <div className="text-slate-600 select-none hidden sm:block">➔</div>
-
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider font-mono font-sans">To:</span>
-              <input
-                type="date"
-                value={cloneDestDate}
-                onChange={(e) => { setCloneDestDate(e.target.value); setCloneError(null); setPendingCloneData(null); }}
-                className="bg-slate-900 border border-slate-800/80 px-2.5 py-1 rounded text-xs text-emerald-400 font-mono font-bold focus:outline-none focus:border-emerald-500/55 transition-colors"
-              />
-            </div>
-
-            <button
-              type="button"
-              onClick={handleCloneAllotments}
-              disabled={isCloningLoading || !!pendingCloneData}
-              className={`px-4 py-1.5 bg-blue-600 hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/10 active:scale-95 text-white font-bold text-xs rounded-lg transition-all flex items-center justify-center gap-1.5 shrink-0 ${(isCloningLoading || pendingCloneData) ? 'opacity-75 cursor-not-allowed' : ''}`}
-            >
-              {isCloningLoading ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-200" />
-              ) : (
-                <Copy className="w-3.5 h-3.5 text-blue-100" />
-              )}
-              <span>{isCloningLoading ? 'Cloning...' : 'Clone & Edit'}</span>
-            </button>
+          <div>
+            <h3 className="text-xs font-bold text-slate-200 tracking-wide uppercase">Clone Production Sheets</h3>
+            <p className="text-[11px] text-slate-400">
+              Duplicate complete sequence of quantities, prices and discounts from search date to target date.
+            </p>
           </div>
         </div>
 
-        {/* Clone error */}
-        {cloneError && (
-          <div className="flex items-start gap-2 bg-red-950/60 border border-red-800/60 rounded-xl px-4 py-2.5 animate-slide-up">
-            <ShieldAlert className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
-            <p className="text-xs text-red-300">{cloneError}</p>
-            <button onClick={() => setCloneError(null)} className="ml-auto text-red-400 hover:text-red-200 text-xs font-bold shrink-0">✕</button>
+        <div className="flex flex-wrap items-center gap-3 bg-slate-950/80 p-2 rounded-xl border border-slate-800/60 grow lg:grow-0 justify-between lg:justify-start">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider font-mono pl-1 font-sans">From:</span>
+            <input
+              type="date"
+              value={cloneSrcDate}
+              onChange={(e) => setCloneSrcDate(e.target.value)}
+              className="bg-slate-900 border border-slate-800/80 px-2.5 py-1 rounded text-xs text-blue-400 font-mono font-bold focus:outline-none focus:border-blue-500/55 transition-colors"
+            />
           </div>
-        )}
 
-        {/* Clone inline confirmation */}
-        {pendingCloneData && (
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-blue-950/60 border border-blue-700/60 rounded-xl px-4 py-3 animate-slide-up">
-            <div className="grow">
-              <p className="text-xs font-bold text-blue-200">Confirm Clone</p>
-              <p className="text-[11px] text-blue-300 mt-0.5">
-                Copy all allotments from <span className="font-mono font-bold">{pendingCloneData.srcDate}</span> → <span className="font-mono font-bold">{pendingCloneData.destDate}</span> for all {shops.length} shops?
-                Values (weights, tray, wastage, rates, discounts) will load into the editor. Save manually after reviewing.
-              </p>
-            </div>
-            <div className="flex gap-2 shrink-0">
-              <button
-                onClick={handleConfirmClone}
-                className="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-lg transition-all flex items-center gap-1.5"
-              >
-                <Copy className="w-3 h-3" /> Confirm Clone
-              </button>
-              <button
-                onClick={() => setPendingCloneData(null)}
-                className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold text-xs rounded-lg transition-all"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        )}
+          <div className="text-slate-600 select-none hidden sm:block">➔</div>
 
-        {/* Clone success */}
-        {cloneSuccess && (
-          <div className="flex items-start gap-2 bg-emerald-950/60 border border-emerald-700/60 rounded-xl px-4 py-2.5 animate-slide-up">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-            <p className="text-xs text-emerald-300 grow">{cloneSuccess}</p>
-            <button onClick={() => setCloneSuccess(null)} className="ml-auto text-emerald-400 hover:text-emerald-200 text-xs font-bold shrink-0">✕</button>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider font-mono font-sans">To:</span>
+            <input
+              type="date"
+              value={cloneDestDate}
+              onChange={(e) => setCloneDestDate(e.target.value)}
+              className="bg-slate-900 border border-slate-800/80 px-2.5 py-1 rounded text-xs text-emerald-400 font-mono font-bold focus:outline-none focus:border-emerald-500/55 transition-colors"
+            />
           </div>
-        )}
+
+          <button
+            type="button"
+            onClick={handleCloneAllotments}
+            disabled={isCloningLoading}
+            className={`px-4 py-1.5 bg-blue-600 hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/10 active:scale-95 text-white font-bold text-xs rounded-lg transition-all flex items-center justify-center gap-1.5 shrink-0 ${isCloningLoading ? 'opacity-75 cursor-not-allowed' : ''}`}
+          >
+            {isCloningLoading ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-200" />
+            ) : (
+              <Copy className="w-3.5 h-3.5 text-blue-100" />
+            )}
+            <span>{isCloningLoading ? 'Cloning...' : 'Clone & Edit'}</span>
+          </button>
+        </div>
       </div>
 
       {/* SUCCESS ALERTS */}
@@ -1745,23 +1709,14 @@ export default function DailyProduction({
                     <span>Bill total: <strong className="text-emerald-400">₹ {getShopTotals(selectedShopId).totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></span>
                   </div>
 
-                  <div className="flex flex-col items-end gap-2">
-                    {showClearConfirm && (
-                      <div className="flex items-center gap-2 bg-rose-950/70 border border-rose-700/60 rounded-xl px-3 py-2 animate-slide-up">
-                        <p className="text-[11px] text-rose-300 font-semibold">Clear all rows for this shop?</p>
-                        <button onClick={handleConfirmClear} className="px-3 py-1 bg-rose-700 hover:bg-rose-600 text-white font-bold text-[11px] rounded-lg transition-all">Yes, Clear</button>
-                        <button onClick={() => setShowClearConfirm(false)} className="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold text-[11px] rounded-lg transition-all">Cancel</button>
-                      </div>
-                    )}
-                    <button
-                      type="button"
-                      onClick={handleClearShopSheet}
-                      className="px-4 py-1.5 bg-rose-950/40 hover:bg-rose-950 border border-rose-900/60 text-rose-300 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5"
-                    >
-                      <Trash2 className="w-3.5 h-3.5 shrink-0" />
-                      Clear Shop Row Values
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={handleClearShopSheet}
+                    className="px-4 py-1.5 bg-rose-950/40 hover:bg-rose-950 border border-rose-900/60 text-rose-300 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 self-end md:self-auto"
+                  >
+                    <Trash2 className="w-3.5 h-3.5 shrink-0" />
+                    Clear Shop Row Values
+                  </button>
                 </div>
 
               </div>
