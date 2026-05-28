@@ -1,0 +1,2 @@
+- [SQLite on NixOS](sqlite-nixos.md) — `better-sqlite3` fails to compile on NixOS; use `sqlite3` (pure JS) instead. Use a single persistent connection with WAL mode for safe concurrency.
+- [Data persistence strategy](persistence-strategy.md) — SQLite replaces localStorage for zero-client-setup deployment. The `rajadhani.db` file is portable alongside the app.

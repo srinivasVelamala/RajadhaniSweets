@@ -5,12 +5,24 @@ import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from "dotenv";
 import { execFileSync } from "child_process";
+import {
+  initDatabase,
+  getAllShops, setAllShops, addShop, updateShop,
+  getAllItems, setAllItems, addItem, updateItem,
+  getAllProduction, setAllProduction, addProduction,
+  getAllDispatches, setAllDispatches, addDispatch, updateDispatch,
+  getAllInventory, setAllInventory, updateInventory,
+  getAllExpenses, setAllExpenses, addExpense,
+  getAllWorkers, setAllWorkers, addWorker, updateWorker
+} from "./src/db.js";
 
 dotenv.config();
 
 async function startServer() {
   const app = express();
   const PORT = 5000;
+
+  await initDatabase();
 
   app.use(cors());
   app.use(express.json({ limit: '10mb' }));
@@ -213,6 +225,140 @@ async function startServer() {
     } catch (err: any) {
       console.error("Excel sync failed:", err.message);
       res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // ── SQLITE REST API ──────────────────────────────────────────────────────────────
+  const jsonWrap = (data: any) => ({ success: true, data });
+
+  // SHOPS
+  app.get("/api/shops", async (req, res) => {
+    try { res.json(jsonWrap(await getAllShops())); }
+    catch (e: any) { res.status(500).json({ success: false, error: e.message }); }
+  });
+  app.post("/api/shops", async (req, res) => {
+    try { await addShop(req.body); res.json({ success: true }); }
+    catch (e: any) { res.status(500).json({ success: false, error: e.message }); }
+  });
+  app.put("/api/shops", async (req, res) => {
+    try { await updateShop(req.body); res.json({ success: true }); }
+    catch (e: any) { res.status(500).json({ success: false, error: e.message }); }
+  });
+  app.post("/api/shops/bulk", async (req, res) => {
+    try { await setAllShops(req.body); res.json({ success: true }); }
+    catch (e: any) { res.status(500).json({ success: false, error: e.message }); }
+  });
+
+  // ITEMS
+  app.get("/api/items", async (req, res) => {
+    try { res.json(jsonWrap(await getAllItems())); }
+    catch (e: any) { res.status(500).json({ success: false, error: e.message }); }
+  });
+  app.post("/api/items", async (req, res) => {
+    try { await addItem(req.body); res.json({ success: true }); }
+    catch (e: any) { res.status(500).json({ success: false, error: e.message }); }
+  });
+  app.put("/api/items", async (req, res) => {
+    try { await updateItem(req.body); res.json({ success: true }); }
+    catch (e: any) { res.status(500).json({ success: false, error: e.message }); }
+  });
+  app.post("/api/items/bulk", async (req, res) => {
+    try { await setAllItems(req.body); res.json({ success: true }); }
+    catch (e: any) { res.status(500).json({ success: false, error: e.message }); }
+  });
+
+  // PRODUCTION
+  app.get("/api/production", async (req, res) => {
+    try { res.json(jsonWrap(await getAllProduction())); }
+    catch (e: any) { res.status(500).json({ success: false, error: e.message }); }
+  });
+  app.post("/api/production", async (req, res) => {
+    try { await addProduction(req.body); res.json({ success: true }); }
+    catch (e: any) { res.status(500).json({ success: false, error: e.message }); }
+  });
+  app.post("/api/production/bulk", async (req, res) => {
+    try { await setAllProduction(req.body); res.json({ success: true }); }
+    catch (e: any) { res.status(500).json({ success: false, error: e.message }); }
+  });
+
+  // DISPATCHES
+  app.get("/api/dispatches", async (req, res) => {
+    try { res.json(jsonWrap(await getAllDispatches())); }
+    catch (e: any) { res.status(500).json({ success: false, error: e.message }); }
+  });
+  app.post("/api/dispatches", async (req, res) => {
+    try { await addDispatch(req.body); res.json({ success: true }); }
+    catch (e: any) { res.status(500).json({ success: false, error: e.message }); }
+  });
+  app.put("/api/dispatches", async (req, res) => {
+    try { await updateDispatch(req.body); res.json({ success: true }); }
+    catch (e: any) { res.status(500).json({ success: false, error: e.message }); }
+  });
+  app.post("/api/dispatches/bulk", async (req, res) => {
+    try { await setAllDispatches(req.body); res.json({ success: true }); }
+    catch (e: any) { res.status(500).json({ success: false, error: e.message }); }
+  });
+
+  // INVENTORY
+  app.get("/api/inventory", async (req, res) => {
+    try { res.json(jsonWrap(await getAllInventory())); }
+    catch (e: any) { res.status(500).json({ success: false, error: e.message }); }
+  });
+  app.put("/api/inventory", async (req, res) => {
+    try { await updateInventory(req.body); res.json({ success: true }); }
+    catch (e: any) { res.status(500).json({ success: false, error: e.message }); }
+  });
+  app.post("/api/inventory/bulk", async (req, res) => {
+    try { await setAllInventory(req.body); res.json({ success: true }); }
+    catch (e: any) { res.status(500).json({ success: false, error: e.message }); }
+  });
+
+  // EXPENSES
+  app.get("/api/expenses", async (req, res) => {
+    try { res.json(jsonWrap(await getAllExpenses())); }
+    catch (e: any) { res.status(500).json({ success: false, error: e.message }); }
+  });
+  app.post("/api/expenses", async (req, res) => {
+    try { await addExpense(req.body); res.json({ success: true }); }
+    catch (e: any) { res.status(500).json({ success: false, error: e.message }); }
+  });
+  app.post("/api/expenses/bulk", async (req, res) => {
+    try { await setAllExpenses(req.body); res.json({ success: true }); }
+    catch (e: any) { res.status(500).json({ success: false, error: e.message }); }
+  });
+
+  // WORKERS
+  app.get("/api/workers", async (req, res) => {
+    try { res.json(jsonWrap(await getAllWorkers())); }
+    catch (e: any) { res.status(500).json({ success: false, error: e.message }); }
+  });
+  app.post("/api/workers", async (req, res) => {
+    try { await addWorker(req.body); res.json({ success: true }); }
+    catch (e: any) { res.status(500).json({ success: false, error: e.message }); }
+  });
+  app.put("/api/workers", async (req, res) => {
+    try { await updateWorker(req.body); res.json({ success: true }); }
+    catch (e: any) { res.status(500).json({ success: false, error: e.message }); }
+  });
+  app.post("/api/workers/bulk", async (req, res) => {
+    try { await setAllWorkers(req.body); res.json({ success: true }); }
+    catch (e: any) { res.status(500).json({ success: false, error: e.message }); }
+  });
+
+  // MIGRATION: import localStorage data into SQLite
+  app.post("/api/migrate", async (req, res) => {
+    try {
+      const { shops, items, production, dispatches, inventory, expenses, workers } = req.body;
+      if (shops) await setAllShops(shops);
+      if (items) await setAllItems(items);
+      if (production) await setAllProduction(production);
+      if (dispatches) await setAllDispatches(dispatches);
+      if (inventory) await setAllInventory(inventory);
+      if (expenses) await setAllExpenses(expenses);
+      if (workers) await setAllWorkers(workers);
+      res.json({ success: true, message: "Data migrated to SQLite" });
+    } catch (e: any) {
+      res.status(500).json({ success: false, error: e.message });
     }
   });
 

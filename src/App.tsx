@@ -26,86 +26,165 @@ import Workers from './components/Workers';
 import ExcelMigration from './components/ExcelMigration';
 import Reports from './components/Reports';
 
+const API_BASE = '';
+
+async function apiGet<T>(path: string): Promise<T> {
+  const r = await fetch(`${API_BASE}${path}`);
+  if (!r.ok) throw new Error(`${path} ${r.status}`);
+  const json = await r.json();
+  if (!json.success) throw new Error(json.error || 'API error');
+  return json.data;
+}
+
+async function apiPost(path: string, body: any) {
+  const r = await fetch(`${API_BASE}${path}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) throw new Error(`${path} ${r.status}`);
+  const json = await r.json();
+  if (!json.success) throw new Error(json.error || 'API error');
+  return json;
+}
+
+async function apiPut(path: string, body: any) {
+  const r = await fetch(`${API_BASE}${path}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) throw new Error(`${path} ${r.status}`);
+  const json = await r.json();
+  if (!json.success) throw new Error(json.error || 'API error');
+  return json;
+}
+
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [userRole, setUserRole] = useState<'Admin' | 'Operator'>('Admin');
   const [fastEntryMode, setFastEntryMode] = useState<boolean>(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Core local states database with persistent LocalStorage mirrors
-  const [shops, setShops] = useState<Shop[]>(() => {
-    const saved = localStorage.getItem('rajadhani_shops_v_excel_24may_v4');
-    return saved ? JSON.parse(saved) : INITIAL_SHOPS;
-  });
-  const [items, setItems] = useState<SweetItem[]>(() => {
-    const saved = localStorage.getItem('rajadhani_items_v_excel_24may_v4');
-    return saved ? JSON.parse(saved) : INITIAL_SWEETS;
-  });
-  const [production, setProduction] = useState<ProductionEntry[]>(() => {
-    const saved = localStorage.getItem('rajadhani_production_v_excel_24may_v4');
-    return saved ? JSON.parse(saved) : INITIAL_PRODUCTION;
-  });
-  const [dispatches, setDispatches] = useState<TripEntry[]>(() => {
-    const saved = localStorage.getItem('rajadhani_dispatches_v_excel_24may_v4');
-    let loaded: TripEntry[] = saved ? JSON.parse(saved) : INITIAL_TRIPS;
-    
-    // Auto-backfill May 23 dispatches if they don't exist, to support "dupe yesterday" out-of-the-box on first load
-    const hasMay23 = loaded.some((d: TripEntry) => d.date === '2026-05-23');
-    if (!hasMay23) {
-      const may24trips = loaded.filter((d: TripEntry) => d.date === '2026-05-24');
-      const may23trips = may24trips.map((trip: TripEntry) => ({
-        ...trip,
-        id: `${trip.id}_may23_${Math.random()}`,
-        date: '2026-05-23'
-      }));
-      loaded = [...loaded, ...may23trips];
+  const [shops, setShops] = useState<Shop[]>([]);
+  const [items, setItems] = useState<SweetItem[]>([]);
+  const [production, setProduction] = useState<ProductionEntry[]>([]);
+  const [dispatches, setDispatches] = useState<TripEntry[]>([]);
+  const [inventory, setInventory] = useState<InventoryItem[]>([]);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [workers, setWorkers] = useState<Worker[]>([]);
+
+  // Load all data from SQLite on mount
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      try {
+        const [s, i, p, d, inv, e, w] = await Promise.all([
+          apiGet<Shop[]>('/api/shops'),
+          apiGet<SweetItem[]>('/api/items'),
+          apiGet<ProductionEntry[]>('/api/production'),
+          apiGet<TripEntry[]>('/api/dispatches'),
+          apiGet<InventoryItem[]>('/api/inventory'),
+          apiGet<Expense[]>('/api/expenses'),
+          apiGet<Worker[]>('/api/workers'),
+        ]);
+        if (cancelled) return;
+        // If all tables are empty, migrate localStorage data or seed defaults
+        const isEmpty = !s.length && !i.length && !p.length && !d.length && !inv.length && !e.length && !w.length;
+        if (isEmpty) {
+          const migrated = await tryMigrateLocalStorage();
+          if (migrated) return;
+          // Seed defaults
+          await Promise.all([
+            apiPost('/api/shops/bulk', INITIAL_SHOPS),
+            apiPost('/api/items/bulk', INITIAL_SWEETS),
+            apiPost('/api/production/bulk', INITIAL_PRODUCTION),
+            apiPost('/api/dispatches/bulk', INITIAL_TRIPS),
+            apiPost('/api/inventory/bulk', INITIAL_INVENTORY),
+            apiPost('/api/expenses/bulk', INITIAL_EXPENSES),
+            apiPost('/api/workers/bulk', INITIAL_WORKERS),
+          ]);
+          // Reload after seeding
+          const [s2, i2, p2, d2, inv2, e2, w2] = await Promise.all([
+            apiGet<Shop[]>('/api/shops'),
+            apiGet<SweetItem[]>('/api/items'),
+            apiGet<ProductionEntry[]>('/api/production'),
+            apiGet<TripEntry[]>('/api/dispatches'),
+            apiGet<InventoryItem[]>('/api/inventory'),
+            apiGet<Expense[]>('/api/expenses'),
+            apiGet<Worker[]>('/api/workers'),
+          ]);
+          if (!cancelled) {
+            setShops(s2);
+            setItems(i2);
+            setProduction(p2);
+            setDispatches(d2);
+            setInventory(inv2);
+            setExpenses(e2);
+            setWorkers(w2);
+          }
+        } else {
+          setShops(s);
+          setItems(i);
+          setProduction(p);
+          setDispatches(d);
+          setInventory(inv);
+          setExpenses(e);
+          setWorkers(w);
+        }
+      } catch (err: any) {
+        if (!cancelled) setError(err.message);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     }
-    return loaded;
-  });
-  const [inventory, setInventory] = useState<InventoryItem[]>(() => {
-    const saved = localStorage.getItem('rajadhani_inventory_v_excel_24may_v4');
-    return saved ? JSON.parse(saved) : INITIAL_INVENTORY;
-  });
-  const [expenses, setExpenses] = useState<Expense[]>(() => {
-    const saved = localStorage.getItem('rajadhani_expenses_v_excel_24may_v4');
-    return saved ? JSON.parse(saved) : INITIAL_EXPENSES;
-  });
-  const [workers, setWorkers] = useState<Worker[]>(() => {
-    const saved = localStorage.getItem('rajadhani_workers_v_excel_24may_v4');
-    return saved ? JSON.parse(saved) : INITIAL_WORKERS;
-  });
+    load();
+    return () => { cancelled = true; };
+  }, []);
 
-  // Keep LocalStorage databases fully persistent
-  useEffect(() => {
-    localStorage.setItem('rajadhani_shops_v_excel_24may_v4', JSON.stringify(shops));
-  }, [shops]);
-  useEffect(() => {
-    localStorage.setItem('rajadhani_items_v_excel_24may_v4', JSON.stringify(items));
-  }, [items]);
-  useEffect(() => {
-    localStorage.setItem('rajadhani_production_v_excel_24may_v4', JSON.stringify(production));
-  }, [production]);
-  useEffect(() => {
-    localStorage.setItem('rajadhani_dispatches_v_excel_24may_v4', JSON.stringify(dispatches));
-  }, [dispatches]);
-  useEffect(() => {
-    localStorage.setItem('rajadhani_inventory_v_excel_24may_v4', JSON.stringify(inventory));
-  }, [inventory]);
-  useEffect(() => {
-    localStorage.setItem('rajadhani_expenses_v_excel_24may_v4', JSON.stringify(expenses));
-  }, [expenses]);
-  useEffect(() => {
-    localStorage.setItem('rajadhani_workers_v_excel_24may_v4', JSON.stringify(workers));
-  }, [workers]);
+  async function tryMigrateLocalStorage(): Promise<boolean> {
+    const data: Record<string, any> = {};
+    const keys = [
+      'rajadhani_shops_v_excel_24may_v4',
+      'rajadhani_items_v_excel_24may_v4',
+      'rajadhani_production_v_excel_24may_v4',
+      'rajadhani_dispatches_v_excel_24may_v4',
+      'rajadhani_inventory_v_excel_24may_v4',
+      'rajadhani_expenses_v_excel_24may_v4',
+      'rajadhani_workers_v_excel_24may_v4',
+    ];
+    let hasAny = false;
+    for (const key of keys) {
+      const v = localStorage.getItem(key);
+      if (v) {
+        data[key] = JSON.parse(v);
+        hasAny = true;
+      }
+    }
+    if (!hasAny) return false;
+
+    await apiPost('/api/migrate', {
+      shops: data['rajadhani_shops_v_excel_24may_v4'] || undefined,
+      items: data['rajadhani_items_v_excel_24may_v4'] || undefined,
+      production: data['rajadhani_production_v_excel_24may_v4'] || undefined,
+      dispatches: data['rajadhani_dispatches_v_excel_24may_v4'] || undefined,
+      inventory: data['rajadhani_inventory_v_excel_24may_v4'] || undefined,
+      expenses: data['rajadhani_expenses_v_excel_24may_v4'] || undefined,
+      workers: data['rajadhani_workers_v_excel_24may_v4'] || undefined,
+    });
+
+    // Clear localStorage after migration
+    for (const key of keys) localStorage.removeItem(key);
+    return true;
+  }
 
   // System alert notifications
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
-  // Periodically generate notifications for realism (low stock, debtors and pending dispatches)
   useEffect(() => {
     const list: Notification[] = [];
-    
-    // Low stock checks
     inventory.forEach(item => {
       if (item.remainingStock <= item.lowStockAlertLevel) {
         list.push({
@@ -118,179 +197,138 @@ export default function App() {
         });
       }
     });
-
-    // Outstanding dues checks
     shops.forEach(sh => {
       if (sh.outstandingBalance > 5000) {
         list.push({
           id: `notif-shop-${sh.id}`,
           type: 'warning',
           title: `High Outstanding Balance: ${sh.name}`,
-          message: `Cumulative credit balances at ₹${sh.outstandingBalance.toLocaleString()}. Limit: ${sh.creditDays || 15} days.`,
+          message: `Cumulative credit balances at \u20b9${sh.outstandingBalance.toLocaleString()}. Limit: ${sh.creditDays || 15} days.`,
           timestamp: '1h ago',
           read: false
         });
       }
     });
-
     setNotifications(list);
   }, [inventory, shops, dispatches.length]);
 
   // STATE MANIPULATORS
-  
-  // Shops Master manipulation
-  const handleAddShop = (newShop: Omit<Shop, 'id' | 'outstandingBalance'>) => {
-    const created: Shop = {
-      ...newShop,
-      id: `SH-${Date.now()}`,
-      outstandingBalance: 0
-    };
+
+  const handleAddShop = async (newShop: Omit<Shop, 'id' | 'outstandingBalance'>) => {
+    const created: Shop = { ...newShop, id: `SH-${Date.now()}`, outstandingBalance: 0 };
+    await apiPost('/api/shops', created);
     setShops([created, ...shops]);
   };
 
-  const handleUpdateShop = (updated: Shop) => {
+  const handleUpdateShop = async (updated: Shop) => {
+    await apiPut('/api/shops', updated);
     setShops(shops.map(s => s.id === updated.id ? updated : s));
   };
 
-  // Sweets Catalog manipulation
-  const handleAddItem = (newItem: Omit<SweetItem, 'id'>) => {
-    const created: SweetItem = {
-      ...newItem,
-      id: `SW-${Date.now()}`
-    };
+  const handleAddItem = async (newItem: Omit<SweetItem, 'id'>) => {
+    const created: SweetItem = { ...newItem, id: `SW-${Date.now()}` };
+    await apiPost('/api/items', created);
     setItems([created, ...items]);
   };
 
-  const handleUpdateItem = (updated: SweetItem) => {
+  const handleUpdateItem = async (updated: SweetItem) => {
+    await apiPut('/api/items', updated);
     setItems(items.map(it => it.id === updated.id ? updated : it));
   };
 
-  // Morning production entry
-  const handleAddProduction = (newEntry: Omit<ProductionEntry, 'id'>) => {
-    const created: ProductionEntry = {
-      ...newEntry,
-      id: `PR-${Date.now()}`
-    };
+  const handleAddProduction = async (newEntry: Omit<ProductionEntry, 'id'>) => {
+    const created: ProductionEntry = { ...newEntry, id: `PR-${Date.now()}` };
+    await apiPost('/api/production', created);
     setProduction([created, ...production]);
   };
 
-  const handleSaveBulkProduction = (date: string, entries: Omit<ProductionEntry, 'id'>[]) => {
+  const handleSaveBulkProduction = async (date: string, entries: Omit<ProductionEntry, 'id'>[]) => {
     const withoutDate = production.filter(p => p.date !== date);
-    const withIds = entries.map((e, idx) => ({
-      ...e,
-      id: `PR-${date}-${Date.now()}-${idx}`
-    }));
-    setProduction([...withIds, ...withoutDate]);
+    const withIds = entries.map((e, idx) => ({ ...e, id: `PR-${date}-${Date.now()}-${idx}` }));
+    const all = [...withIds, ...withoutDate];
+    await apiPost('/api/production/bulk', all);
+    setProduction(all);
   };
 
-  // Core Dispatch Trip entry & adjusting Shop outstanding balances automatically!
-  const handleAddDispatch = (newTrip: Omit<TripEntry, 'id'>) => {
-    const created: TripEntry = {
-      ...newTrip,
-      id: `TR-${Date.now()}`
-    };
-
+  const handleAddDispatch = async (newTrip: Omit<TripEntry, 'id'>) => {
+    const created: TripEntry = { ...newTrip, id: `TR-${Date.now()}` };
+    await apiPost('/api/dispatches', created);
     setDispatches([created, ...dispatches]);
-
-    // Automatically increase outstanding balance of the receiving shop
-    setShops(shops.map(sh => {
-      if (sh.id === newTrip.shopId) {
-        return {
-          ...sh,
-          outstandingBalance: sh.outstandingBalance + newTrip.totalAmount
-        };
-      }
-      return sh;
-    }));
+    // Update shop balance
+    const updatedShops = shops.map(sh =>
+      sh.id === newTrip.shopId ? { ...sh, outstandingBalance: sh.outstandingBalance + newTrip.totalAmount } : sh
+    );
+    await apiPost('/api/shops/bulk', updatedShops);
+    setShops(updatedShops);
   };
 
-  const handleUpdateDispatch = (updated: TripEntry) => {
+  const handleUpdateDispatch = async (updated: TripEntry) => {
+    await apiPut('/api/dispatches', updated);
     setDispatches(dispatches.map(d => d.id === updated.id ? updated : d));
   };
 
-  const handleSaveDailyProductionData = (
+  const handleSaveDailyProductionData = async (
     date: string,
     allDateTrips: TripEntry[],
     productionEntries: Omit<ProductionEntry, 'id'>[]
   ) => {
-    // 1. Calculate the outstanding balance differences for each shop
     const oldDateDispatches = dispatches.filter(d => d.date === date);
     const balanceMap: Record<string, number> = {};
+    oldDateDispatches.forEach(d => { balanceMap[d.shopId] = (balanceMap[d.shopId] || 0) - d.totalAmount; });
+    allDateTrips.forEach(d => { balanceMap[d.shopId] = (balanceMap[d.shopId] || 0) + d.totalAmount; });
 
-    // Subtract old total amounts
-    oldDateDispatches.forEach(d => {
-      balanceMap[d.shopId] = (balanceMap[d.shopId] || 0) - d.totalAmount;
+    const updatedShops = shops.map(sh => {
+      const diff = balanceMap[sh.id] || 0;
+      if (diff !== 0) {
+        return { ...sh, outstandingBalance: Number(Math.max(0, sh.outstandingBalance + diff).toFixed(2)) };
+      }
+      return sh;
     });
 
-    // Add new total amounts
-    allDateTrips.forEach(d => {
-      balanceMap[d.shopId] = (balanceMap[d.shopId] || 0) + d.totalAmount;
-    });
+    const updatedDispatches = [...allDateTrips, ...dispatches.filter(d => d.date !== date)];
+    const updatedProduction = [
+      ...productionEntries.map((pe, idx) => ({ ...pe, id: `PR-${date}-${Date.now()}-${idx}-${Math.random()}` })),
+      ...production.filter(p => p.date !== date)
+    ];
 
-    // 2. Update shops outstandingBalance
-    setShops(prevShops =>
-      prevShops.map(sh => {
-        const diff = balanceMap[sh.id] || 0;
-        if (diff !== 0) {
-          const newBal = Math.max(0, sh.outstandingBalance + diff);
-          return {
-            ...sh,
-            outstandingBalance: Number(newBal.toFixed(2))
-          };
-        }
-        return sh;
-      })
-    );
+    await Promise.all([
+      apiPost('/api/shops/bulk', updatedShops),
+      apiPost('/api/dispatches/bulk', updatedDispatches),
+      apiPost('/api/production/bulk', updatedProduction),
+    ]);
 
-    // 3. Update dispatches: filter out this date and add the new trips
-    setDispatches(prevDispatches => {
-      const distinctOtherTrips = prevDispatches.filter(d => d.date !== date);
-      return [...allDateTrips, ...distinctOtherTrips];
-    });
-
-    // 4. Update production ledger
-    setProduction(prevProduction => {
-      const otherLedger = prevProduction.filter(p => p.date !== date);
-      const withIds = productionEntries.map((pe, idx) => ({
-        ...pe,
-        id: `PR-${date}-${Date.now()}-${idx}-${Math.random()}`
-      }));
-      return [...withIds, ...otherLedger];
-    });
+    setShops(updatedShops);
+    setDispatches(updatedDispatches);
+    setProduction(updatedProduction);
   };
 
-  // Inventory adjustment
-  const handleUpdateInventory = (updated: InventoryItem) => {
+  const handleUpdateInventory = async (updated: InventoryItem) => {
+    await apiPut('/api/inventory', updated);
     setInventory(inventory.map(inv => inv.id === updated.id ? updated : inv));
   };
 
-  // Expense Logger
-  const handleAddExpense = (newExpense: Omit<Expense, 'id'>) => {
-    const created: Expense = {
-      ...newExpense,
-      id: `EX-${Date.now()}`
-    };
+  const handleAddExpense = async (newExpense: Omit<Expense, 'id'>) => {
+    const created: Expense = { ...newExpense, id: `EX-${Date.now()}` };
+    await apiPost('/api/expenses', created);
     setExpenses([created, ...expenses]);
   };
 
-  // Workers registration
-  const handleAddWorker = (newWorker: Omit<Worker, 'id' | 'attendance' | 'payments'>) => {
-    const created: Worker = {
-      ...newWorker,
-      id: `WK-${Date.now()}`,
-      attendance: {},
-      payments: []
-    };
+  const handleAddWorker = async (newWorker: Omit<Worker, 'id' | 'attendance' | 'payments'>) => {
+    const created: Worker = { ...newWorker, id: `WK-${Date.now()}`, attendance: {}, payments: [] };
+    await apiPost('/api/workers', created);
     setWorkers([created, ...workers]);
   };
 
-  const handleUpdateWorker = (updated: Worker) => {
+  const handleUpdateWorker = async (updated: Worker) => {
+    await apiPut('/api/workers', updated);
     setWorkers(workers.map(w => w.id === updated.id ? updated : w));
   };
 
-  // Legacy Excel Sheet import reconciliations
-  const handleExcelImportCompleted = (importedShops: Shop[], importedItems: SweetItem[], importedDispatches: TripEntry[]) => {
-    // Merge and update without duplication based on names
+  const handleExcelImportCompleted = async (
+    importedShops: Shop[],
+    importedItems: SweetItem[],
+    importedDispatches: TripEntry[]
+  ) => {
     const mergedShops = [...shops];
     importedShops.forEach(nSh => {
       const existingIdx = mergedShops.findIndex(s => s.name.toLowerCase() === nSh.name.toLowerCase());
@@ -327,10 +365,44 @@ export default function App() {
 
     const mergedDispatches = [...importedDispatches, ...dispatches];
 
+    await Promise.all([
+      apiPost('/api/shops/bulk', mergedShops),
+      apiPost('/api/items/bulk', mergedItems),
+      apiPost('/api/dispatches/bulk', mergedDispatches),
+    ]);
+
     setShops(mergedShops);
     setItems(mergedItems);
     setDispatches(mergedDispatches);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-300">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+          <span className="font-mono text-sm">Loading SQLite Engine...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-red-400">
+        <div className="flex flex-col items-center gap-3 max-w-md text-center">
+          <ShieldAlert className="w-8 h-8" />
+          <span className="font-mono text-sm">Database Error: {error}</span>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded text-xs text-slate-300 hover:bg-slate-700"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans flex antialiased selection:bg-amber-500 selection:text-slate-950">
@@ -461,11 +533,14 @@ export default function App() {
           )}
 
           {activeTab === 'shops' && (
-            <Shops 
-              shops={shops} 
-              onAddShop={handleAddShop} 
+            <Shops
+              shops={shops}
+              onAddShop={handleAddShop}
               onUpdateShop={handleUpdateShop}
-              onSyncShops={setShops}
+              onSyncShops={async (shops) => {
+                await apiPost('/api/shops/bulk', shops);
+                setShops(shops);
+              }}
               userRole={userRole}
             />
           )}
@@ -551,7 +626,7 @@ export default function App() {
         {/* BOTTOM LEGAL MARGIN CREDITS RAIL (PRINT HIDDEN) */}
         <footer className="pt-6 border-t border-slate-900 flex justify-between items-center text-[10px] text-slate-550 text-slate-500 font-mono print:hidden">
           <span>Rajadhani Sweets Enterprise Dashboard</span>
-          <span>© 2026. SQLite Local Engine Active</span>
+          <span>&copy; 2026. SQLite Local Engine Active</span>
         </footer>
 
       </div>
